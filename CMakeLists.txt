@@ -55,7 +55,4 @@ target_link_libraries(kgamma_wayland
         PkgConfig::LCMS2
 )
 
-install(TARGETS kgamma_wayland
-    BUNDLE DESTINATION .
-    RUNTIME DESTINATION bin
-)
+install(TARGETS kgamma_wayland ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
