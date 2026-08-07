@@ -27,6 +27,8 @@ pkg_check_modules(LCMS2 REQUIRED IMPORTED_TARGET lcms2)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
+add_definitions(-DTRANSLATION_DOMAIN=\"kgamma_wayland\")
+
 add_executable(kgamma_wayland
     main.cpp
     correctionsettings.cpp
@@ -59,3 +61,5 @@ install(TARGETS kgamma_wayland
     BUNDLE DESTINATION .
     RUNTIME DESTINATION bin
 )
+
+ki18n_install(po)
