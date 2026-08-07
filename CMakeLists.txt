@@ -55,6 +55,7 @@ target_link_libraries(kgamma_wayland
         KF6::Kirigami
         KF6::Screen
         PkgConfig::LCMS2
+	KF6::I18nQml
 )
 
 install(TARGETS kgamma_wayland
