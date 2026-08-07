@@ -307,6 +307,7 @@ bool CorrectionSettings::apply()
 
     QString errorMessage;
     if (!writeProfile(targetProfilePath, &errorMessage)) {
+        qWarning() << errorMessage;
         return false;
     }
 
