@@ -405,3 +405,5 @@ void CorrectionSettings::setLastSavedProfile(const QString &profilePath)
     m_lastSavedProfile = profilePath;
     Q_EMIT lastSavedProfileChanged();
 }
+
+#include "moc_correctionsettings.cpp"
