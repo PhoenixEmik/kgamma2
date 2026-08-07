@@ -58,9 +58,4 @@ target_link_libraries(kgamma_wayland
 	KF6::I18nQml
 )
 
-install(TARGETS kgamma_wayland
-    BUNDLE DESTINATION .
-    RUNTIME DESTINATION bin
-)
-
-ki18n_install(po)
+install(TARGETS kgamma_wayland ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
