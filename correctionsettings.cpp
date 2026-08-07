@@ -307,6 +307,7 @@ bool CorrectionSettings::apply()
 
     QString errorMessage;
     if (!writeProfile(targetProfilePath, &errorMessage)) {
+        qWarning() << errorMessage;
         return false;
     }
 
@@ -404,3 +405,5 @@ void CorrectionSettings::setLastSavedProfile(const QString &profilePath)
     m_lastSavedProfile = profilePath;
     Q_EMIT lastSavedProfileChanged();
 }
+
+#include "moc_correctionsettings.cpp"

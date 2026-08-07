@@ -96,3 +96,5 @@ void ScreenProfileManager::refreshScreenNames()
     m_screenNames = names;
     Q_EMIT screenNamesChanged();
 }
+
+#include "moc_screenprofilemanager.cpp"

@@ -27,6 +27,8 @@ pkg_check_modules(LCMS2 REQUIRED IMPORTED_TARGET lcms2)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
+add_definitions(-DTRANSLATION_DOMAIN=\"kgamma_wayland\")
+
 add_executable(kgamma_wayland
     main.cpp
     correctionsettings.cpp
@@ -53,6 +55,7 @@ target_link_libraries(kgamma_wayland
         KF6::Kirigami
         KF6::Screen
         PkgConfig::LCMS2
+	KF6::I18nQml
 )
 
 install(TARGETS kgamma_wayland ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})

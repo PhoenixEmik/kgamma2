@@ -9,6 +9,8 @@
 #include <KLocalizedContext>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <KLocalizedQmlContext>
+
 
 int main(int argc, char *argv[])
 {
@@ -17,7 +19,7 @@ int main(int argc, char *argv[])
     app.setOrganizationName(QStringLiteral("kgamma_wayland"));
 
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
+    KLocalization::setupLocalizedContext(&engine);
     CorrectionSettings correctionSettings;
     engine.rootContext()->setContextProperty(QStringLiteral("correctionSettings"), &correctionSettings);
 
