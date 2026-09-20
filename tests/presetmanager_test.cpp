@@ -78,9 +78,14 @@ int main(int argc, char **argv)
     auto changedDp = std::find_if(changed.outputs.begin(), changed.outputs.end(), [](const OutputPreset &output) {
         return output.outputId == QStringLiteral("stable-dp");
     });
-    changedDp->values.gamma = 0.9;
+    changedDp->values.gamma = GammaRange::maximum;
     if (!reader.savePreset(changed, &error) || reader.currentLabel() != QStringLiteral("night (modified)")) {
         qCritical() << "Changed preset did not update current label" << error;
+        return 1;
+    }
+    const auto maximumPreset = reader.loadPreset(QStringLiteral("night"), &error);
+    if (!maximumPreset || maximumPreset->outputs[0].values.gamma != GammaRange::maximum) {
+        qCritical() << "Maximum gamma did not persist in preset" << error;
         return 1;
     }
     if (!reader.removePreset(QStringLiteral("night"), &error) || !reader.presets().isEmpty()) {

@@ -28,7 +28,7 @@ void CorrectionSettings::updateDraftModified()
 
 void CorrectionSettings::setGamma(double value)
 {
-    if (std::isfinite(value) && value >= 0.1 && value <= 3.0 && m_values.gamma != value) { m_values.gamma = value; updateDraftModified(); emit valuesChanged(); }
+    if (std::isfinite(value) && value >= GammaRange::minimum && value <= GammaRange::maximum && m_values.gamma != value) { m_values.gamma = value; updateDraftModified(); emit valuesChanged(); }
 }
 void CorrectionSettings::setRed(double value)
 {

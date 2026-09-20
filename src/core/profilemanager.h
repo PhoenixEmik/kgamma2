@@ -4,6 +4,11 @@
 
 #include <QString>
 
+namespace GammaRange {
+inline constexpr double minimum = 0.1;
+inline constexpr double maximum = 10.0;
+}
+
 struct GammaValues {
     double gamma = 1.0;
     double red = 1.0;

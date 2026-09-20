@@ -137,11 +137,11 @@ QString ProfileManager::profileDirectory()
 
 bool ProfileManager::writeDerived(const QString &basePath, const QString &destination, const GammaValues &values, QString *error)
 {
-    if (!std::isfinite(values.gamma) || values.gamma < 0.1 || values.gamma > 3.0 ||
+    if (!std::isfinite(values.gamma) || values.gamma < GammaRange::minimum || values.gamma > GammaRange::maximum ||
         !std::isfinite(values.red) || values.red < 0 || values.red > 2 ||
         !std::isfinite(values.green) || values.green < 0 || values.green > 2 ||
         !std::isfinite(values.blue) || values.blue < 0 || values.blue > 2) {
-        *error = QStringLiteral("Gamma must be 0.1–3.0 and channels must be 0–2.0");
+        *error = QStringLiteral("Gamma must be 0.1–10.0 and channels must be 0–2.0");
         return false;
     }
 

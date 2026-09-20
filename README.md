@@ -48,6 +48,8 @@ Without arguments, `kgamma2` starts the GUI. Adjustments without `--output`
 apply to all connected outputs. Unspecified channel values keep that output's
 current kgamma2 values. `--outputs` also prints persistent output IDs, which
 can be used with `--output` if a connector name is ambiguous.
+Gamma accepts 0.1–10.0. The GUI gamma slider uses a logarithmic scale so 1.0
+remains at its center.
 
 The generated profiles and restore state live under the Qt application data
 directory, normally `~/.local/share/kgamma2/`. When an existing ICC profile

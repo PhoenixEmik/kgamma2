@@ -94,7 +94,7 @@ int runCli(int argc, char **argv)
     parser.setApplicationDescription(QStringLiteral("Adjust per-output gamma using ICC VCGT profiles\nPresets: kgamma2 preset --help"));
     parser.addHelpOption();
     parser.addVersionOption();
-    parser.addOption({QStringLiteral("gamma"), QStringLiteral("Gamma value (0.1–3.0)"), QStringLiteral("value")});
+    parser.addOption({QStringLiteral("gamma"), QStringLiteral("Gamma value (0.1–10.0)"), QStringLiteral("value")});
     parser.addOption({QStringLiteral("red"), QStringLiteral("Red scale (0–2.0)"), QStringLiteral("value")});
     parser.addOption({QStringLiteral("green"), QStringLiteral("Green scale (0–2.0)"), QStringLiteral("value")});
     parser.addOption({QStringLiteral("blue"), QStringLiteral("Blue scale (0–2.0)"), QStringLiteral("value")});
@@ -155,11 +155,11 @@ int runCli(int argc, char **argv)
             else { if (status.adjusted) ++successes; out << status.output.name << ": restored\n"; }
         } else {
             auto values = status.values;
-            if (!readNumber(parser, QStringLiteral("gamma"), 0.1, 3.0, &values.gamma) ||
+            if (!readNumber(parser, QStringLiteral("gamma"), GammaRange::minimum, GammaRange::maximum, &values.gamma) ||
                 !readNumber(parser, QStringLiteral("red"), 0, 2.0, &values.red) ||
                 !readNumber(parser, QStringLiteral("green"), 0, 2.0, &values.green) ||
                 !readNumber(parser, QStringLiteral("blue"), 0, 2.0, &values.blue)) {
-                err << "Gamma must be 0.1–3.0 and channels must be 0–2.0.\n";
+                err << "Gamma must be 0.1–10.0 and channels must be 0–2.0.\n";
                 return 2;
             }
             if (!controller.apply(status.output.key, values, &error)) ++failures;

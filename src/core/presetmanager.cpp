@@ -12,7 +12,7 @@
 namespace {
 bool validValues(const GammaValues &values)
 {
-    return std::isfinite(values.gamma) && values.gamma >= 0.1 && values.gamma <= 3.0 &&
+    return std::isfinite(values.gamma) && values.gamma >= GammaRange::minimum && values.gamma <= GammaRange::maximum &&
         std::isfinite(values.red) && values.red >= 0.0 && values.red <= 2.0 &&
         std::isfinite(values.green) && values.green >= 0.0 && values.green <= 2.0 &&
         std::isfinite(values.blue) && values.blue >= 0.0 && values.blue <= 2.0;

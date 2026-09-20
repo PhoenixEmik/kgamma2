@@ -55,6 +55,7 @@ int main(int argc, char **argv)
     const QString base = dir.path() + QStringLiteral("/base.icc");
     const QString first = dir.path() + QStringLiteral("/first.icc");
     const QString second = dir.path() + QStringLiteral("/second.icc");
+    const QString maximum = dir.path() + QStringLiteral("/maximum.icc");
     auto *profile = cmsCreate_sRGBProfile();
     if (!profile) return 1;
     const auto baseName = QFile::encodeName(base);
@@ -75,6 +76,16 @@ int main(int argc, char **argv)
     const auto secondVcgt = tag(secondBytes, "vcgt");
     if (firstVcgt.size() != 18 + 3 * 256 * 2 || secondVcgt.size() != firstVcgt.size() || firstVcgt == secondVcgt) {
         qCritical() << "VCGT was not generated or composed";
+        return 1;
+    }
+    if (!ProfileManager::writeDerived(base, maximum, {GammaRange::maximum, 1.0, 1.0, 1.0}, &error) ||
+        tag(readFile(maximum), "vcgt").size() != firstVcgt.size()) {
+        qCritical() << "Maximum gamma did not produce a VCGT" << error;
+        return 1;
+    }
+    error.clear();
+    if (ProfileManager::writeDerived(base, maximum, {GammaRange::maximum + 0.01, 1.0, 1.0, 1.0}, &error) || error.isEmpty()) {
+        qCritical() << "Gamma above the maximum was accepted";
         return 1;
     }
     return 0;

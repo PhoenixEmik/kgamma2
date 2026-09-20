@@ -148,13 +148,13 @@ Kirigami.ApplicationWindow {
                     Label { text: i18n("Gamma"); Layout.preferredWidth: 70 }
                     Slider {
                         Layout.fillWidth: true
-                        from: 0.1
-                        to: 3.0
-                        stepSize: 0.01
-                        value: correctionSettings.gamma
+                        from: -1.0
+                        to: 1.0
+                        stepSize: 0.001
+                        value: Math.log(correctionSettings.gamma) / Math.LN10
                         enabled: correctionSettings.screenNames.length > 0
                         Accessible.name: i18n("Gamma")
-                        onMoved: correctionSettings.gamma = value
+                        onMoved: correctionSettings.gamma = Math.round(Math.pow(10, value) * 100) / 100
                     }
                     Label { text: correctionSettings.gamma.toFixed(2); Layout.preferredWidth: 42; horizontalAlignment: Text.AlignRight }
 
