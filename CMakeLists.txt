@@ -29,22 +29,35 @@ qt_standard_project_setup(REQUIRES 6.5)
 
 add_definitions(-DTRANSLATION_DOMAIN=\"kgamma_wayland\")
 
-add_executable(kgamma_wayland
-    main.cpp
-    correctionsettings.cpp
-    correctionsettings.h
-    screenprofilemanager.cpp
-    screenprofilemanager.h
+add_library(kgamma2_core STATIC
+    src/core/gammacontroller.cpp
+    src/core/gammacontroller.h
+    src/core/outputmanager.cpp
+    src/core/outputmanager.h
+    src/core/profilemanager.cpp
+    src/core/profilemanager.h
 )
+target_include_directories(kgamma2_core PUBLIC src/core)
+target_link_libraries(kgamma2_core PUBLIC Qt6::Core KF6::Screen PkgConfig::LCMS2)
 
-qt_add_qml_module(kgamma_wayland
+add_executable(kgamma2
+    src/gui/main.cpp
+    src/gui/correctionsettings.cpp
+    src/gui/correctionsettings.h
+    src/cli/main.cpp
+    src/cli/main.h
+)
+target_include_directories(kgamma2 PRIVATE src/cli)
+target_link_libraries(kgamma2 PRIVATE kgamma2_core)
+
+qt_add_qml_module(kgamma2
     URI KGammaWayland
     VERSION 1.0
     QML_FILES
         qml/Main.qml
 )
 
-target_link_libraries(kgamma_wayland
+target_link_libraries(kgamma2
     PRIVATE
         Qt6::Core
         Qt6::Gui
@@ -58,4 +71,11 @@ target_link_libraries(kgamma_wayland
 	KF6::I18nQml
 )
 
-install(TARGETS kgamma_wayland ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS kgamma2 ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
+
+include(CTest)
+if(BUILD_TESTING)
+    add_executable(profilemanager_test tests/profilemanager_test.cpp)
+    target_link_libraries(profilemanager_test PRIVATE kgamma2_core)
+    add_test(NAME profilemanager_test COMMAND profilemanager_test)
+endif()

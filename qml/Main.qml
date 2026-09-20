@@ -113,10 +113,26 @@ Kirigami.ApplicationWindow {
             wrapMode: Text.WrapAnywhere
         }
 
-        Button {
+        Label {
+            Layout.fillWidth: true
+            visible: correctionSettings.lastError.length > 0
+            text: correctionSettings.lastError
+            color: Kirigami.Theme.negativeTextColor
+            wrapMode: Text.Wrap
+        }
+
+        RowLayout {
             Layout.alignment: Qt.AlignRight
-            text: i18n("Apply")
-            onClicked: correctionSettings.apply()
+            Button {
+                text: i18n("Reset")
+                enabled: correctionSettings.screenNames.length > 0
+                onClicked: correctionSettings.reset()
+            }
+            Button {
+                text: i18n("Apply")
+                enabled: correctionSettings.screenNames.length > 0
+                onClicked: correctionSettings.apply()
+            }
         }
     }
 }
