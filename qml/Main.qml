@@ -12,14 +12,14 @@ import org.kde.kirigami as Kirigami
 Kirigami.ApplicationWindow {
     id: window
 
-    width: 520
-    height: 360
+    width: 620
+    height: 350
     visible: true
     title: i18n("Wayland Gamma")
     pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
 
+    minimumWidth: 500
     minimumHeight: mainLayout.implicitHeight + Kirigami.Units.largeSpacing * 2
-    minimumWidth: mainLayout.implicitWidth+ Kirigami.Units.largeSpacing * 2
 
     Dialog {
         id: saveAsDialog
@@ -39,7 +39,6 @@ Kirigami.ApplicationWindow {
         }
     }
 
-
     ColumnLayout {
         id: mainLayout
         anchors.fill: parent
@@ -52,131 +51,166 @@ Kirigami.ApplicationWindow {
             level: 1
         }
 
-        Kirigami.FormLayout {
+        GroupBox {
+            title: i18n("Presets")
             Layout.fillWidth: true
 
-            ComboBox {
-                Layout.fillWidth: true
-                Kirigami.FormData.label: i18n("Preset:")
-                model: correctionSettings.presetNames
-                currentIndex: correctionSettings.selectedPresetIndex
-                enabled: count > 0
-                onActivated: correctionSettings.selectedPresetIndex = currentIndex
-            }
+            contentItem: ColumnLayout {
+                spacing: Kirigami.Units.smallSpacing
 
-            Label {
-                Layout.fillWidth: true
-                Kirigami.FormData.label: i18n("Current:")
-                text: correctionSettings.activePresetLabel
-            }
-        }
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Kirigami.Units.smallSpacing
 
-        RowLayout {
-            Layout.alignment: Qt.AlignRight
-            Button {
-                text: i18n("Save")
-                enabled: correctionSettings.selectedPresetIndex >= 0
-                onClicked: correctionSettings.savePreset()
-            }
-            Button {
-                text: i18n("Save As")
-                enabled: correctionSettings.screenNames.length > 0
-                onClicked: {
-                    presetNameField.text = ""
-                    saveAsDialog.open()
+                    ComboBox {
+                        Layout.fillWidth: true
+                        model: correctionSettings.presetNames
+                        currentIndex: correctionSettings.selectedPresetIndex
+                        displayText: count > 0 ? currentText : i18n("No presets saved")
+                        enabled: count > 0
+                        Accessible.name: i18n("Preset")
+                        onActivated: correctionSettings.selectedPresetIndex = currentIndex
+                    }
+
+                    Button {
+                        text: i18n("Apply Preset")
+                        enabled: correctionSettings.selectedPresetIndex >= 0
+                        onClicked: correctionSettings.applyPreset()
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Kirigami.Units.smallSpacing
+
+                    Label {
+                        Layout.fillWidth: true
+                        text: i18n("Current: %1", correctionSettings.activePresetLabel)
+                        elide: Text.ElideRight
+                    }
+
+                    Button {
+                        text: i18n("Save")
+                        enabled: correctionSettings.selectedPresetIndex >= 0
+                        onClicked: correctionSettings.savePreset()
+                    }
+
+                    Button {
+                        text: i18n("Save As…")
+                        enabled: correctionSettings.screenNames.length > 0
+                        onClicked: {
+                            presetNameField.text = ""
+                            saveAsDialog.open()
+                        }
+                    }
+
+                    Button {
+                        text: i18n("Delete")
+                        enabled: correctionSettings.selectedPresetIndex >= 0
+                        onClicked: correctionSettings.deletePreset()
+                    }
                 }
             }
-            Button {
-                text: i18n("Delete")
-                enabled: correctionSettings.selectedPresetIndex >= 0
-                onClicked: correctionSettings.deletePreset()
-            }
-            Button {
-                text: i18n("Apply Preset")
-                enabled: correctionSettings.selectedPresetIndex >= 0
-                onClicked: correctionSettings.applyPreset()
-            }
         }
 
-        Kirigami.FormLayout {
+        GroupBox {
+            title: i18n("Selected monitor")
             Layout.fillWidth: true
 
-            ComboBox {
-                Layout.fillWidth: true
-                Kirigami.FormData.label: i18n("Screen:")
-                model: correctionSettings.screenNames
-                currentIndex: correctionSettings.selectedScreenIndex
-                enabled: count > 0
-                onActivated: correctionSettings.selectedScreenIndex = currentIndex
-            }
+            contentItem: ColumnLayout {
+                spacing: Kirigami.Units.smallSpacing
 
-            Slider {
-                Layout.fillWidth: true
-                Kirigami.FormData.label: i18n("Gamma:")
-                from: 0.1
-                to: 3.0
-                stepSize: 0.01
-                value: correctionSettings.gamma
-                onMoved: correctionSettings.gamma = value
-            }
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Kirigami.Units.smallSpacing
 
-            Label {
-                text: correctionSettings.gamma.toFixed(2)
-            }
+                    Label {
+                        text: i18n("Screen")
+                        Layout.preferredWidth: 70
+                    }
 
-            Slider {
-                Layout.fillWidth: true
-                Kirigami.FormData.label: i18n("Red:")
-                from: 0.0
-                to: 2.0
-                stepSize: 0.01
-                value: correctionSettings.red
-                onMoved: correctionSettings.red = value
-            }
+                    ComboBox {
+                        Layout.fillWidth: true
+                        model: correctionSettings.screenNames
+                        currentIndex: correctionSettings.selectedScreenIndex
+                        enabled: count > 0
+                        Accessible.name: i18n("Screen")
+                        onActivated: correctionSettings.selectedScreenIndex = currentIndex
+                    }
+                }
 
-            Label {
-                text: correctionSettings.red.toFixed(2)
-            }
+                GridLayout {
+                    Layout.fillWidth: true
+                    columns: 3
+                    columnSpacing: Kirigami.Units.smallSpacing
+                    rowSpacing: 0
 
-            Slider {
-                Layout.fillWidth: true
-                Kirigami.FormData.label: i18n("Green:")
-                from: 0.0
-                to: 2.0
-                stepSize: 0.01
-                value: correctionSettings.green
-                onMoved: correctionSettings.green = value
-            }
+                    Label { text: i18n("Gamma"); Layout.preferredWidth: 70 }
+                    Slider {
+                        Layout.fillWidth: true
+                        from: 0.1
+                        to: 3.0
+                        stepSize: 0.01
+                        value: correctionSettings.gamma
+                        enabled: correctionSettings.screenNames.length > 0
+                        Accessible.name: i18n("Gamma")
+                        onMoved: correctionSettings.gamma = value
+                    }
+                    Label { text: correctionSettings.gamma.toFixed(2); Layout.preferredWidth: 42; horizontalAlignment: Text.AlignRight }
 
-            Label {
-                text: correctionSettings.green.toFixed(2)
-            }
+                    Label { text: i18n("Red"); Layout.preferredWidth: 70 }
+                    Slider {
+                        Layout.fillWidth: true
+                        from: 0.0
+                        to: 2.0
+                        stepSize: 0.01
+                        value: correctionSettings.red
+                        enabled: correctionSettings.screenNames.length > 0
+                        Accessible.name: i18n("Red")
+                        onMoved: correctionSettings.red = value
+                    }
+                    Label { text: correctionSettings.red.toFixed(2); Layout.preferredWidth: 42; horizontalAlignment: Text.AlignRight }
 
-            Slider {
-                Layout.fillWidth: true
-                Kirigami.FormData.label: i18n("Blue:")
-                from: 0.0
-                to: 2.0
-                stepSize: 0.01
-                value: correctionSettings.blue
-                onMoved: correctionSettings.blue = value
-            }
+                    Label { text: i18n("Green"); Layout.preferredWidth: 70 }
+                    Slider {
+                        Layout.fillWidth: true
+                        from: 0.0
+                        to: 2.0
+                        stepSize: 0.01
+                        value: correctionSettings.green
+                        enabled: correctionSettings.screenNames.length > 0
+                        Accessible.name: i18n("Green")
+                        onMoved: correctionSettings.green = value
+                    }
+                    Label { text: correctionSettings.green.toFixed(2); Layout.preferredWidth: 42; horizontalAlignment: Text.AlignRight }
 
-            Label {
-                text: correctionSettings.blue.toFixed(2)
+                    Label { text: i18n("Blue"); Layout.preferredWidth: 70 }
+                    Slider {
+                        Layout.fillWidth: true
+                        from: 0.0
+                        to: 2.0
+                        stepSize: 0.01
+                        value: correctionSettings.blue
+                        enabled: correctionSettings.screenNames.length > 0
+                        Accessible.name: i18n("Blue")
+                        onMoved: correctionSettings.blue = value
+                    }
+                    Label { text: correctionSettings.blue.toFixed(2); Layout.preferredWidth: 42; horizontalAlignment: Text.AlignRight }
+                }
+
+                Label {
+                    Layout.fillWidth: true
+                    visible: correctionSettings.lastSavedProfile.length > 0
+                    text: i18n("Correction active on this monitor")
+                    opacity: 0.7
+                    ToolTip.text: correctionSettings.lastSavedProfile
+                    ToolTip.visible: hoverHandler.hovered
+                    HoverHandler { id: hoverHandler }
+                }
             }
         }
 
-        Item {
-            Layout.fillHeight: true
-        }
-
-        Label {
-            Layout.fillWidth: true
-            visible: correctionSettings.lastSavedProfile.length > 0
-            text: i18n("Last saved profile: %1", correctionSettings.lastSavedProfile)
-            wrapMode: Text.WrapAnywhere
-        }
+        Item { Layout.fillHeight: true }
 
         Label {
             Layout.fillWidth: true
@@ -188,13 +222,17 @@ Kirigami.ApplicationWindow {
 
         RowLayout {
             Layout.alignment: Qt.AlignRight
+            spacing: Kirigami.Units.smallSpacing
+
             Button {
                 text: i18n("Reset")
                 enabled: correctionSettings.screenNames.length > 0
                 onClicked: correctionSettings.reset()
             }
+
             Button {
-                text: i18n("Apply")
+                text: i18n("Apply Changes")
+                highlighted: true
                 enabled: correctionSettings.screenNames.length > 0
                 onClicked: correctionSettings.apply()
             }
