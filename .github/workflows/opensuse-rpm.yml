@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: 2026 PhoenixEmik <phoenix0919mik@gmail.com>
+# SPDX-License-Identifier: BSD-3-Clause
+
+name: Build openSUSE RPM
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rpm:
+    runs-on: ubuntu-latest
+    container:
+      image: registry.opensuse.org/opensuse/tumbleweed:latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Install packaging tools
+        run: |
+          zypper --non-interactive --gpg-auto-import-keys install --no-recommends \
+            git rpm-build make tar gzip
+
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install build requirements from spec
+        run: |
+          set -euo pipefail
+          rpmspec -q --buildrequires packaging/opensuse/kgamma2.spec > "$RUNNER_TEMP/build-requires.txt"
+          mapfile -t packages < "$RUNNER_TEMP/build-requires.txt"
+          zypper --non-interactive --gpg-auto-import-keys install --no-recommends "${packages[@]}"
+
+      - name: Build and test RPM
+        run: |
+          set -euo pipefail
+          version="$(rpmspec -q --qf '%{VERSION}\n' packaging/opensuse/kgamma2.spec)"
+          topdir="$RUNNER_TEMP/kgamma2-rpmbuild"
+          mkdir -p "$topdir"/{BUILD,RPMS,SOURCES,SPECS,SRPMS,tmp}
+          git archive --format=tar.gz --prefix="kgamma2-$version/" HEAD \
+            -o "$topdir/SOURCES/kgamma2-$version.tar.gz"
+          rpmbuild --define "_topdir $topdir" --define "_tmppath $topdir/tmp" \
+            -ba packaging/opensuse/kgamma2.spec
+          mkdir -p dist
+          cp "$topdir"/RPMS/*/*.rpm "$topdir"/SRPMS/*.rpm dist/
+          sha256sum dist/*.rpm > dist/SHA256SUMS
+
+      - name: Upload RPMs
+        uses: actions/upload-artifact@v4
+        with:
+          name: kgamma2-opensuse-tumbleweed-x86_64
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30

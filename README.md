@@ -92,3 +92,9 @@ later change to a monitor's calibration remains the base for new adjustments.
 `packaging/opensuse/kgamma2.spec` builds one package with the GUI and CLI.
 Create a source tarball named `kgamma2-0.1.0.tar.gz` from this tree, then pass
 it as `Source0` to `rpmbuild -ba` or an OBS package.
+
+The [Build openSUSE RPM workflow](.github/workflows/opensuse-rpm.yml) builds
+against openSUSE Tumbleweed on pushes to `main` or `v*` tags, pull requests,
+and manual runs. Download the `kgamma2-opensuse-tumbleweed-x86_64` artifact
+from the run's GitHub Actions page. It contains the installable RPM, source
+RPM, debug RPMs, and SHA-256 checksums.
