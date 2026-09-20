@@ -46,8 +46,9 @@ jobs:
           version="$(rpmspec -q --qf '%{VERSION}\n' packaging/opensuse/kgamma2.spec)"
           topdir="$RUNNER_TEMP/kgamma2-rpmbuild"
           mkdir -p "$topdir"/{BUILD,RPMS,SOURCES,SPECS,SRPMS,tmp}
-          git archive --format=tar.gz --prefix="kgamma2-$version/" HEAD \
-            -o "$topdir/SOURCES/kgamma2-$version.tar.gz"
+          tar --exclude-vcs --exclude=build --exclude=dist \
+            --transform="s|^./|kgamma2-$version/|" \
+            -czf "$topdir/SOURCES/kgamma2-$version.tar.gz" .
           rpmbuild --define "_topdir $topdir" --define "_tmppath $topdir/tmp" \
             -ba packaging/opensuse/kgamma2.spec
           mkdir -p dist
