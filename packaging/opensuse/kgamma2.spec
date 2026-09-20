@@ -11,6 +11,7 @@ Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  kf6-extra-cmake-modules
+BuildRequires:  kf6-kconfig-devel
 BuildRequires:  kf6-ki18n-devel
 BuildRequires:  kf6-kirigami-devel
 BuildRequires:  libkscreen6-devel

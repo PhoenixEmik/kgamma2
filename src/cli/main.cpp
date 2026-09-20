@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 #include "main.h"
 #include "gammacontroller.h"
+#include "presetmanager.h"
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
@@ -28,6 +29,57 @@ bool readNumber(const QCommandLineParser &parser, const QString &name, double mi
     *target = value;
     return true;
 }
+
+int runPresetCommand(const QStringList &arguments)
+{
+    QTextStream out(stdout), err(stderr);
+    const QString usage = QStringLiteral("Usage: kgamma2 preset {save|apply|list|show|delete|current} [NAME]\n");
+    if (arguments.isEmpty() || arguments.first() == QStringLiteral("--help")) { out << usage; return arguments.isEmpty() ? 2 : 0; }
+    const auto command = arguments.first();
+    const bool needsName = command == QStringLiteral("save") || command == QStringLiteral("apply") ||
+        command == QStringLiteral("show") || command == QStringLiteral("delete");
+    if ((!needsName && arguments.size() != 1) || (needsName && arguments.size() != 2)) { err << usage; return 2; }
+    PresetManager presets;
+    QString error;
+    if (command == QStringLiteral("list")) {
+        for (const auto &name : presets.presets()) out << name << '\n';
+        return 0;
+    }
+    if (command == QStringLiteral("current")) { out << presets.currentLabel() << '\n'; return 0; }
+    if (command == QStringLiteral("show")) {
+        const auto preset = presets.loadPreset(arguments[1], &error);
+        if (!preset) { err << error << '\n'; return 1; }
+        out << preset->name << '\n';
+        for (const auto &output : preset->outputs) {
+            out << "  " << output.connector << " (" << output.outputId << ") " << (output.enabled ? "enabled" : "disabled") << '\n';
+            out << "    gamma=" << output.values.gamma << " red=" << output.values.red
+                << " green=" << output.values.green << " blue=" << output.values.blue << '\n';
+            out << "    model=" << output.model << " serial=" << output.serial << " edid=" << output.edidHash << '\n';
+            out << "    original source=" << sourceName(output.originalSource) << '\n';
+            out << "    original ICC=" << (output.originalIcc.isEmpty() ? QStringLiteral("none") : output.originalIcc) << '\n';
+        }
+        return 0;
+    }
+    if (command == QStringLiteral("delete")) {
+        if (!presets.removePreset(arguments[1], &error)) { err << error << '\n'; return 1; }
+        out << arguments[1] << ": deleted\n";
+        return 0;
+    }
+    GammaController controller;
+    if (command == QStringLiteral("save")) {
+        if (!controller.refresh(&error)) { err << error << '\n'; return 1; }
+        if (!presets.savePreset(PresetManager::capture(arguments[1], controller.statuses()), &error)) { err << error << '\n'; return 1; }
+        out << arguments[1] << ": saved\n";
+        return 0;
+    }
+    if (command == QStringLiteral("apply")) {
+        if (!presets.applyPreset(arguments[1], controller, &error)) { err << error << '\n'; return 1; }
+        out << arguments[1] << ": applied\n";
+        return 0;
+    }
+    err << usage;
+    return 2;
+}
 }
 
 int runCli(int argc, char **argv)
@@ -35,8 +87,11 @@ int runCli(int argc, char **argv)
     QCoreApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("kgamma2"));
     app.setOrganizationName(QStringLiteral("kgamma2"));
+    if (app.arguments().size() > 1 && app.arguments().at(1) == QStringLiteral("preset")) {
+        return runPresetCommand(app.arguments().mid(2));
+    }
     QCommandLineParser parser;
-    parser.setApplicationDescription(QStringLiteral("Adjust per-output gamma using ICC VCGT profiles"));
+    parser.setApplicationDescription(QStringLiteral("Adjust per-output gamma using ICC VCGT profiles\nPresets: kgamma2 preset --help"));
     parser.addHelpOption();
     parser.addVersionOption();
     parser.addOption({QStringLiteral("gamma"), QStringLiteral("Gamma value (0.1–3.0)"), QStringLiteral("value")});
@@ -92,11 +147,12 @@ int runCli(int argc, char **argv)
         return 0;
     }
     int failures = 0;
+    int successes = 0;
     for (const auto &status : statuses) {
         error.clear();
         if (parser.isSet(QStringLiteral("reset"))) {
             if (!controller.reset(status.output.key, &error)) ++failures;
-            else out << status.output.name << ": restored\n";
+            else { if (status.adjusted) ++successes; out << status.output.name << ": restored\n"; }
         } else {
             auto values = status.values;
             if (!readNumber(parser, QStringLiteral("gamma"), 0.1, 3.0, &values.gamma) ||
@@ -107,9 +163,14 @@ int runCli(int argc, char **argv)
                 return 2;
             }
             if (!controller.apply(status.output.key, values, &error)) ++failures;
-            else out << status.output.name << ": applied\n";
+            else { ++successes; out << status.output.name << ": applied\n"; }
         }
         if (!error.isEmpty()) err << status.output.name << ": " << error << '\n';
+    }
+    if (successes > 0) {
+        PresetManager presets;
+        error.clear();
+        if (!presets.markModified(&error)) { err << error << '\n'; return 1; }
     }
     return failures ? 1 : 0;
 }

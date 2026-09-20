@@ -12,6 +12,9 @@ struct ManagedOutput {
     int id = -1;
     QString name;
     QString key;
+    QString edidHash;
+    QString model;
+    QString serial;
     QString iccPath;
     KScreen::Output::ColorProfileSource source = KScreen::Output::ColorProfileSource::sRGB;
 };

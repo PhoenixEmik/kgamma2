@@ -6,6 +6,7 @@
 #include <QCryptographicHash>
 #include <algorithm>
 #include <kscreen/configoperation.h>
+#include <kscreen/edid.h>
 #include <kscreen/getconfigoperation.h>
 #include <kscreen/setconfigoperation.h>
 
@@ -29,7 +30,16 @@ bool OutputManager::refresh(QString *error)
             identity = output->hashMd5() + QLatin1Char(':') + output->name();
         }
         const auto key = QString::fromLatin1(QCryptographicHash::hash(identity.toUtf8(), QCryptographicHash::Sha256).toHex());
-        m_outputs.append({output->id(), output->name(), key, output->iccProfilePath(), output->colorProfileSource()});
+        ManagedOutput managedOutput;
+        managedOutput.id = output->id();
+        managedOutput.name = output->name();
+        managedOutput.key = key;
+        managedOutput.edidHash = output->edid() ? output->edid()->hash() : QString();
+        managedOutput.model = output->model();
+        managedOutput.serial = output->edid() ? output->edid()->serial() : QString();
+        managedOutput.iccPath = output->iccProfilePath();
+        managedOutput.source = output->colorProfileSource();
+        m_outputs.append(managedOutput);
     }
     return true;
 }

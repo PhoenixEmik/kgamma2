@@ -21,6 +21,24 @@ Kirigami.ApplicationWindow {
     minimumHeight: mainLayout.implicitHeight + Kirigami.Units.largeSpacing * 2
     minimumWidth: mainLayout.implicitWidth+ Kirigami.Units.largeSpacing * 2
 
+    Dialog {
+        id: saveAsDialog
+        title: i18n("Save Preset As")
+        modal: true
+        anchors.centerIn: parent
+        width: Math.min(380, window.width - Kirigami.Units.largeSpacing * 2)
+        standardButtons: Dialog.Save | Dialog.Cancel
+        onOpened: presetNameField.forceActiveFocus()
+        onAccepted: correctionSettings.savePresetAs(presetNameField.text.trim())
+
+        TextField {
+            id: presetNameField
+            width: parent.width
+            placeholderText: i18n("Preset name")
+            onAccepted: saveAsDialog.accept()
+        }
+    }
+
 
     ColumnLayout {
         id: mainLayout
@@ -32,6 +50,52 @@ Kirigami.ApplicationWindow {
             Layout.fillWidth: true
             text: i18n("Monitor correction")
             level: 1
+        }
+
+        Kirigami.FormLayout {
+            Layout.fillWidth: true
+
+            ComboBox {
+                Layout.fillWidth: true
+                Kirigami.FormData.label: i18n("Preset:")
+                model: correctionSettings.presetNames
+                currentIndex: correctionSettings.selectedPresetIndex
+                enabled: count > 0
+                onActivated: correctionSettings.selectedPresetIndex = currentIndex
+            }
+
+            Label {
+                Layout.fillWidth: true
+                Kirigami.FormData.label: i18n("Current:")
+                text: correctionSettings.activePresetLabel
+            }
+        }
+
+        RowLayout {
+            Layout.alignment: Qt.AlignRight
+            Button {
+                text: i18n("Save")
+                enabled: correctionSettings.selectedPresetIndex >= 0
+                onClicked: correctionSettings.savePreset()
+            }
+            Button {
+                text: i18n("Save As")
+                enabled: correctionSettings.screenNames.length > 0
+                onClicked: {
+                    presetNameField.text = ""
+                    saveAsDialog.open()
+                }
+            }
+            Button {
+                text: i18n("Delete")
+                enabled: correctionSettings.selectedPresetIndex >= 0
+                onClicked: correctionSettings.deletePreset()
+            }
+            Button {
+                text: i18n("Apply Preset")
+                enabled: correctionSettings.selectedPresetIndex >= 0
+                onClicked: correctionSettings.applyPreset()
+            }
         }
 
         Kirigami.FormLayout {

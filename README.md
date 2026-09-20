@@ -60,6 +60,31 @@ base while the adjustment is active and restores the previous source on Reset.
 KScreen does not expose the effective EDID-derived ICC data for deriving a
 profile from it.
 
+## Presets
+
+Presets capture all connected outputs as one named setup. They are stored in
+`~/.config/kgamma2rc` through KF6 KConfig, separate from the current output
+state and generated ICC files.
+
+```sh
+kgamma2 preset save night
+kgamma2 preset list
+kgamma2 preset show night
+kgamma2 preset apply night
+kgamma2 preset current
+kgamma2 preset delete night
+```
+
+The GUI has a preset selector with Save, Save As, Delete, and Apply. Save
+overwrites the selected preset; Save As creates a new one. Editing a slider
+does not change a saved preset. `preset current` reports `(modified)` after a
+manual adjustment. A preset includes whether each output is adjusted, its
+gamma and RGB values, stable ID, EDID hash, model, serial, connector, and the
+original ICC path for reference. Applying a preset matches the stable ID first,
+then EDID or serial, then connector; disconnected outputs are skipped and an
+ambiguous match is rejected. The stored original ICC path is not applied, so a
+later change to a monitor's calibration remains the base for new adjustments.
+
 ## openSUSE RPM
 
 `packaging/opensuse/kgamma2.spec` builds one package with the GUI and CLI.

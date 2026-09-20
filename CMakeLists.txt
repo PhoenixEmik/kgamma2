@@ -23,6 +23,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2)
 find_package(KF6I18n REQUIRED)
 find_package(KF6Kirigami REQUIRED)
 find_package(KF6Screen REQUIRED)
+find_package(KF6Config REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LCMS2 REQUIRED IMPORTED_TARGET lcms2)
 
@@ -37,9 +38,11 @@ add_library(kgamma2_core STATIC
     src/core/outputmanager.h
     src/core/profilemanager.cpp
     src/core/profilemanager.h
+    src/core/presetmanager.cpp
+    src/core/presetmanager.h
 )
 target_include_directories(kgamma2_core PUBLIC src/core)
-target_link_libraries(kgamma2_core PUBLIC Qt6::Core KF6::Screen PkgConfig::LCMS2)
+target_link_libraries(kgamma2_core PUBLIC Qt6::Core KF6::Screen KF6::ConfigCore PkgConfig::LCMS2)
 
 add_executable(kgamma2
     src/gui/main.cpp
@@ -79,4 +82,7 @@ if(BUILD_TESTING)
     add_executable(profilemanager_test tests/profilemanager_test.cpp)
     target_link_libraries(profilemanager_test PRIVATE kgamma2_core)
     add_test(NAME profilemanager_test COMMAND profilemanager_test)
+    add_executable(presetmanager_test tests/presetmanager_test.cpp)
+    target_link_libraries(presetmanager_test PRIVATE kgamma2_core)
+    add_test(NAME presetmanager_test COMMAND presetmanager_test)
 endif()
