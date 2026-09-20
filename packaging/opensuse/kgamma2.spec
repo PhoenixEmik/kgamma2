@@ -1,9 +1,12 @@
+# SPDX-FileCopyrightText: 2026 PhoenixEmik <phoenix0919mik@gmail.com>
+# SPDX-License-Identifier: BSD-3-Clause
+
 Name:           kgamma2
 Version:        0.1.0
 Release:        0
 Summary:        Gamma adjustment for KDE Plasma Wayland
-License:        LGPL-2.1-or-later AND BSD-3-Clause
-URL:            https://invent.kde.org/davidedmundson/kgamma2
+License:        LGPL-2.1-or-later AND BSD-3-Clause AND CC-BY-SA-4.0 AND CC0-1.0
+URL:            https://github.com/PhoenixEmik/kgamma2
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -36,6 +39,7 @@ and KScreen on KDE Plasma Wayland.
 %cmake_install
 
 %files
+%license LICENSES/*
 %doc README.md
 %{_bindir}/kgamma2
 

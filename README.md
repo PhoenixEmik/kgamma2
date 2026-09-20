@@ -1,9 +1,25 @@
+<!--
+SPDX-FileCopyrightText: 2026 PhoenixEmik <phoenix0919mik@gmail.com>
+SPDX-License-Identifier: CC-BY-SA-4.0
+-->
+
 # kgamma2
 
 kgamma2 adjusts gamma and RGB channels on KDE Plasma Wayland through ICC VCGT
 profiles and KScreen. The GUI and CLI share the same controller. Each output's
 generated profile and its prior ICC path and color profile source are tracked
 separately. Reset restores the previous path and source.
+
+This fork follows [David Edmundson's KDE upstream](https://invent.kde.org/davidedmundson/kgamma2).
+For a new clone, add it with:
+
+```sh
+git remote add upstream https://invent.kde.org/davidedmundson/kgamma2.git
+```
+
+Licensing follows each file's SPDX header: application code is
+`LGPL-2.1-or-later`, CMake and packaging files are `BSD-3-Clause`, and this
+README is `CC-BY-SA-4.0`. The complete texts are in `LICENSES/`.
 
 ## Build
 
