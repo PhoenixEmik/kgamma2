@@ -45,5 +45,6 @@ and KScreen on KDE Plasma Wayland.
 %doc README.md
 %{_bindir}/kgamma2
 %{_datadir}/applications/kgamma2.desktop
+%{_datadir}/icons/hicolor/scalable/apps/kgamma2.svg
 
 %changelog

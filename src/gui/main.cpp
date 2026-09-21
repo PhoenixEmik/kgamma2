@@ -9,6 +9,7 @@
 #include <KLocalizedQmlContext>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QIcon>
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +19,7 @@ int main(int argc, char *argv[])
     app.setApplicationName(QStringLiteral("kgamma2"));
     app.setDesktopFileName(QStringLiteral("kgamma2"));
     app.setOrganizationName(QStringLiteral("kgamma2"));
+    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("kgamma2")));
     QQmlApplicationEngine engine;
     KLocalization::setupLocalizedContext(&engine);
     CorrectionSettings settings;
