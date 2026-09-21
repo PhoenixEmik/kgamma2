@@ -132,7 +132,8 @@ the package on openSUSE Tumbleweed. A successful push to `main` increments the
 patch version, creates a `vX.Y.Z` tag and GitHub Release, and attaches the
 binary RPM, source RPM, debug RPMs, and SHA-256 checksums. Manual runs can
 increment the patch, minor, or major version. Pull requests only produce a
-temporary build artifact.
+temporary build artifact. Pushes that only change `README.md`, `docs/`, or
+workflow files do not create a new version.
 
 For local packaging, `packaging/opensuse/kgamma2.spec` builds the GUI and CLI
 as one RPM. Create a source archive named for the version declared in the spec

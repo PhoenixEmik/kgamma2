@@ -6,6 +6,10 @@ name: Build and release openSUSE RPM
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - README.md
+      - docs/**
+      - .github/**
   pull_request:
   workflow_dispatch:
     inputs:
