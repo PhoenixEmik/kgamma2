@@ -203,7 +203,7 @@ jobs:
         run: |
           apt-get update
           apt-get install --yes --no-install-recommends \
-            ca-certificates cmake debhelper desktop-file-utils dpkg-dev \
+            build-essential ca-certificates cmake debhelper desktop-file-utils dpkg-dev \
             extra-cmake-modules g++ git libkf6config-dev libkf6i18n-dev \
             libkirigami-dev libkscreen-dev liblcms2-dev pkgconf \
             qt6-base-dev qt6-declarative-dev
