@@ -1,20 +1,85 @@
 # SPDX-FileCopyrightText: 2026 PhoenixEmik <phoenix0919mik@gmail.com>
 # SPDX-License-Identifier: BSD-3-Clause
 
-name: Build openSUSE RPM
+name: Build and release openSUSE RPM
 
 on:
   push:
     branches: [main]
-    tags: ['v*']
   pull_request:
   workflow_dispatch:
+    inputs:
+      bump:
+        description: Version component to increment
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'release' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      release: ${{ steps.version.outputs.release }}
+
+    steps:
+      - name: Check out source and tags
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Calculate version
+        id: version
+        env:
+          REQUESTED_BUMP: ${{ inputs.bump || 'patch' }}
+        run: |
+          set -euo pipefail
+          base="$(awk '$1 == "Version:" { print $2; exit }' packaging/opensuse/kgamma2.spec)"
+          latest_tag="$(git tag --list 'v*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)"
+          if [[ -n "$latest_tag" ]]; then
+            base="${latest_tag#v}"
+          fi
+          if [[ ! "$base" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "Invalid base version: $base" >&2
+            exit 1
+          fi
+
+          version="$base"
+          release=false
+          if [[ "$GITHUB_EVENT_NAME" != "pull_request" ]]; then
+            major="${BASH_REMATCH[1]}"
+            minor="${BASH_REMATCH[2]}"
+            patch="${BASH_REMATCH[3]}"
+            case "$REQUESTED_BUMP" in
+              major) major=$((major + 1)); minor=0; patch=0 ;;
+              minor) minor=$((minor + 1)); patch=0 ;;
+              patch) patch=$((patch + 1)) ;;
+              *) echo "Unknown version component: $REQUESTED_BUMP" >&2; exit 1 ;;
+            esac
+            version="$major.$minor.$patch"
+            release=true
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          echo "release=$release" >> "$GITHUB_OUTPUT"
+          echo "Building kgamma2 $version (release: $release)"
+
   rpm:
+    needs: version
     runs-on: ubuntu-latest
     container:
       image: registry.opensuse.org/opensuse/tumbleweed:latest
@@ -29,7 +94,7 @@ jobs:
             git rpm-build make tar gzip
 
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
 
@@ -41,14 +106,17 @@ jobs:
           zypper --non-interactive --gpg-auto-import-keys install --no-recommends "${packages[@]}"
 
       - name: Build and test RPM
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
         run: |
           set -euo pipefail
-          version="$(rpmspec -q --qf '%{VERSION}\n' packaging/opensuse/kgamma2.spec)"
+          sed -i -E "s/^(Version:[[:space:]]*).*/\1$VERSION/" packaging/opensuse/kgamma2.spec
+          test "$(rpmspec -q --qf '%{VERSION}\n' packaging/opensuse/kgamma2.spec)" = "$VERSION"
           topdir="$RUNNER_TEMP/kgamma2-rpmbuild"
           mkdir -p "$topdir"/{BUILD,RPMS,SOURCES,SPECS,SRPMS,tmp}
           tar --exclude-vcs --exclude=build --exclude=dist \
-            --transform="s|^./|kgamma2-$version/|" \
-            -czf "$topdir/SOURCES/kgamma2-$version.tar.gz" .
+            --transform="s|^./|kgamma2-$VERSION/|" \
+            -czf "$topdir/SOURCES/kgamma2-$VERSION.tar.gz" .
           rpmbuild --define "_topdir $topdir" --define "_tmppath $topdir/tmp" \
             -ba packaging/opensuse/kgamma2.spec
           mkdir -p dist
@@ -58,7 +126,32 @@ jobs:
       - name: Upload RPMs
         uses: actions/upload-artifact@v4
         with:
-          name: kgamma2-opensuse-tumbleweed-x86_64
+          name: kgamma2-${{ needs.version.outputs.version }}-opensuse-tumbleweed-x86_64
           path: dist/
           if-no-files-found: error
           retention-days: 30
+
+  release:
+    if: needs.version.outputs.release == 'true'
+    needs: [version, rpm]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download RPM artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: kgamma2-${{ needs.version.outputs.version }}-opensuse-tumbleweed-x86_64
+          path: dist
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.version.outputs.tag }}
+        run: |
+          gh release create "$TAG" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "kgamma2 $TAG" \
+            --generate-notes

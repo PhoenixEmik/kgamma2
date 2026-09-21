@@ -86,6 +86,7 @@ int runCli(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("kgamma2"));
+    app.setApplicationVersion(QStringLiteral(KGAMMA2_VERSION));
     app.setOrganizationName(QStringLiteral("kgamma2"));
     if (app.arguments().size() > 1 && app.arguments().at(1) == QStringLiteral("preset")) {
         return runPresetCommand(app.arguments().mid(2));

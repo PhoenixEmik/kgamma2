@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("kgamma2"));
+    app.setApplicationVersion(QStringLiteral(KGAMMA2_VERSION));
     app.setDesktopFileName(QStringLiteral("kgamma2"));
     app.setOrganizationName(QStringLiteral("kgamma2"));
     app.setWindowIcon(QIcon::fromTheme(QStringLiteral("kgamma2")));

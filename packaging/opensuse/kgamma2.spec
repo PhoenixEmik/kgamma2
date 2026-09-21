@@ -31,7 +31,7 @@ and KScreen on KDE Plasma Wayland.
 %autosetup -p1
 
 %build
-%cmake
+%cmake -DKGAMMA2_VERSION=%{version}
 %cmake_build
 
 %check
