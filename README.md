@@ -11,7 +11,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 <p align="center">
   <a href="https://github.com/PhoenixEmik/kgamma2/releases/latest"><img src="https://img.shields.io/github/v/release/PhoenixEmik/kgamma2?display_name=tag&amp;sort=semver&amp;label=release" alt="Latest release"></a>
-  <a href="https://github.com/PhoenixEmik/kgamma2/actions/workflows/opensuse-rpm.yml"><img src="https://github.com/PhoenixEmik/kgamma2/actions/workflows/opensuse-rpm.yml/badge.svg?branch=main" alt="Linux package builds"></a>
+  <a href="https://github.com/PhoenixEmik/kgamma2/actions/workflows/linux-packages.yml"><img src="https://github.com/PhoenixEmik/kgamma2/actions/workflows/linux-packages.yml/badge.svg?branch=main" alt="Linux package builds"></a>
 </p>
 
 <p align="center">
@@ -137,7 +137,7 @@ profile from it.
 
 ## Releases and packaging
 
-The [Linux package workflow](.github/workflows/opensuse-rpm.yml) builds and
+The [Linux package workflow](.github/workflows/linux-packages.yml) builds and
 tests packages in native openSUSE Tumbleweed, Fedora 45, Ubuntu 26.04, and Arch
 Linux environments. A successful push to `main` increments the patch version,
 creates a `vX.Y.Z` tag and GitHub Release, and attaches the binary packages,
