@@ -34,6 +34,12 @@ before an adjustment.
 - Stable monitor matching with EDID, serial, and connector fallbacks.
 - Native Plasma application launcher and scalable application icon.
 
+## Screenshot
+
+<p align="center">
+  <img src="docs/images/kgamma2-main-window.png" width="800" alt="kgamma2 main window with preset and per-monitor gamma controls">
+</p>
+
 ## Install on openSUSE Tumbleweed
 
 Download the binary RPM from the
@@ -141,7 +147,7 @@ Add it to an existing clone with:
 git remote add upstream https://invent.kde.org/davidedmundson/kgamma2.git
 ```
 
-Licensing follows each file's SPDX header: application code and artwork use
-`LGPL-2.1-or-later`, CMake and packaging files use `BSD-3-Clause`, and this
-README uses `CC-BY-SA-4.0`. Complete license texts are available in
-[`LICENSES/`](LICENSES/).
+Licensing follows each file's SPDX header: application code and the icon use
+`LGPL-2.1-or-later`, CMake and packaging files use `BSD-3-Clause`, and the
+README and screenshot use `CC-BY-SA-4.0`. Complete license texts are available
+in [`LICENSES/`](LICENSES/).
