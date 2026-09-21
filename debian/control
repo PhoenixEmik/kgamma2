@@ -19,6 +19,8 @@ Build-Depends:
 Standards-Version: 4.7.2
 Rules-Requires-Root: no
 Homepage: https://github.com/PhoenixEmik/kgamma2
+Vcs-Browser: https://github.com/PhoenixEmik/kgamma2
+Vcs-Git: https://github.com/PhoenixEmik/kgamma2.git
 
 Package: kgamma2
 Architecture: any
