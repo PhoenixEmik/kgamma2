@@ -1,0 +1,36 @@
+Source: kgamma2
+Section: utils
+Priority: optional
+Maintainer: PhoenixEmik <phoenix0919mik@gmail.com>
+Build-Depends:
+ cmake,
+ debhelper-compat (= 13),
+ desktop-file-utils,
+ extra-cmake-modules,
+ g++,
+ libkf6config-dev,
+ libkf6i18n-dev,
+ libkirigami-dev,
+ libkscreen-dev,
+ liblcms2-dev,
+ pkgconf,
+ qt6-base-dev,
+ qt6-declarative-dev,
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://github.com/PhoenixEmik/kgamma2
+
+Package: kgamma2
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+ qml6-module-org-kde-kirigami,
+ qml6-module-qtquick,
+ qml6-module-qtquick-controls,
+ qml6-module-qtquick-layouts,
+Recommends: qml6-module-org-kde-desktop
+Description: per-monitor gamma adjustment for KDE Plasma Wayland
+ kgamma2 adjusts gamma and RGB channels independently for each monitor on KDE
+ Plasma Wayland. It creates ICC VCGT profiles through KScreen and restores the
+ previous color profile when an adjustment is reset.

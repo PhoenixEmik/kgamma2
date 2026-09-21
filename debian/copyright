@@ -1,0 +1,34 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: kgamma2
+Source: https://github.com/PhoenixEmik/kgamma2
+
+Files: src/* qml/* tests/* data/*
+Copyright: David Edmundson <davidedmundson@kde.org>
+           2026 PhoenixEmik <phoenix0919mik@gmail.com>
+License: LGPL-2.1-or-later
+
+Files: CMakeLists.txt Messages.sh .github/* packaging/* debian/*
+Copyright: David Edmundson <davidedmundson@kde.org>
+           2026 Laurent Montel <montel@kde.org>
+           2026 PhoenixEmik <phoenix0919mik@gmail.com>
+License: BSD-3-Clause
+
+Files: README.md docs/*
+Copyright: 2026 PhoenixEmik <phoenix0919mik@gmail.com>
+License: CC-BY-SA-4.0
+
+Files: .gitignore .gitlab-ci.yml .kde-ci.yml
+Copyright: Laurent Montel <montel@kde.org>
+License: CC0-1.0
+
+License: LGPL-2.1-or-later
+ See /usr/share/common-licenses/LGPL-2.1 on Debian systems.
+
+License: BSD-3-Clause
+ See LICENSES/BSD-3-Clause.txt in the source tree.
+
+License: CC-BY-SA-4.0
+ See LICENSES/CC-BY-SA-4.0.txt in the source tree.
+
+License: CC0-1.0
+ See LICENSES/CC0-1.0.txt in the source tree.

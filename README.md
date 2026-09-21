@@ -11,7 +11,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 <p align="center">
   <a href="https://github.com/PhoenixEmik/kgamma2/releases/latest"><img src="https://img.shields.io/github/v/release/PhoenixEmik/kgamma2?display_name=tag&amp;sort=semver&amp;label=release" alt="Latest release"></a>
-  <a href="https://github.com/PhoenixEmik/kgamma2/actions/workflows/opensuse-rpm.yml"><img src="https://github.com/PhoenixEmik/kgamma2/actions/workflows/opensuse-rpm.yml/badge.svg?branch=main" alt="openSUSE RPM build"></a>
+  <a href="https://github.com/PhoenixEmik/kgamma2/actions/workflows/opensuse-rpm.yml"><img src="https://github.com/PhoenixEmik/kgamma2/actions/workflows/opensuse-rpm.yml/badge.svg?branch=main" alt="Linux package builds"></a>
 </p>
 
 <p align="center">
@@ -40,15 +40,25 @@ before an adjustment.
   <img src="docs/images/kgamma2-main-window.png" width="800" alt="kgamma2 main window with preset and per-monitor gamma controls">
 </p>
 
-## Install on openSUSE Tumbleweed
+## Install packages
 
-Download the binary RPM from the
-[latest release](https://github.com/PhoenixEmik/kgamma2/releases/latest), then
-install it with Zypper so required libraries are resolved automatically:
+Each [GitHub Release](https://github.com/PhoenixEmik/kgamma2/releases/latest)
+contains native packages for these KDE Plasma distributions:
 
-```sh
-sudo zypper install ./kgamma2-[0-9]*.x86_64.rpm
-```
+| Distribution | Package | Install command |
+| --- | --- | --- |
+| openSUSE Tumbleweed | RPM | `sudo zypper install ./kgamma2-[0-9]*.x86_64.rpm` |
+| Fedora KDE 45 | RPM | `sudo dnf install ./kgamma2-[0-9]*.fc45.x86_64.rpm` |
+| Kubuntu / Ubuntu 26.04 | DEB | `sudo apt install ./kgamma2_[0-9]*_amd64.deb` |
+| Arch Linux, Manjaro, EndeavourOS | pacman | `sudo pacman -U ./kgamma2-[0-9]*-x86_64.pkg.tar.zst` |
+
+Download only the package for your distribution, then run its install command
+from the download directory. The package manager installs the required Qt,
+KDE Frameworks, KScreen, and LittleCMS libraries.
+
+KDE neon users can build from source with the commands below. Debian stable is
+not currently a binary target because its official Kirigami development
+package is based on KDE Frameworks 5, while kgamma2 requires Frameworks 6.
 
 ## Build from source
 
@@ -125,19 +135,20 @@ base while the adjustment is active and restores the previous source on Reset.
 KScreen does not expose the effective EDID-derived ICC data for deriving a
 profile from it.
 
-## Releases and RPM packaging
+## Releases and packaging
 
-The [openSUSE workflow](.github/workflows/opensuse-rpm.yml) builds and tests
-the package on openSUSE Tumbleweed. A successful push to `main` increments the
-patch version, creates a `vX.Y.Z` tag and GitHub Release, and attaches the
-binary RPM, source RPM, debug RPMs, and SHA-256 checksums. Manual runs can
-increment the patch, minor, or major version. Pull requests only produce a
-temporary build artifact. Pushes that only change `README.md`, `docs/`, or
+The [Linux package workflow](.github/workflows/opensuse-rpm.yml) builds and
+tests packages in native openSUSE Tumbleweed, Fedora 45, Ubuntu 26.04, and Arch
+Linux environments. A successful push to `main` increments the patch version,
+creates a `vX.Y.Z` tag and GitHub Release, and attaches the binary packages,
+source RPMs, debug RPMs, and SHA-256 checksums. Manual runs can increment the
+patch, minor, or major version. Pull requests and `ci/**` branches only produce
+temporary build artifacts. Pushes that only change `README.md`, `docs/`, or
 workflow files do not create a new version.
 
-For local packaging, `packaging/opensuse/kgamma2.spec` builds the GUI and CLI
-as one RPM. Create a source archive named for the version declared in the spec
-and run `rpmbuild -ba` with that archive as `Source0`.
+Distribution packaging lives in `packaging/opensuse/`, `packaging/fedora/`,
+`packaging/arch/`, and `debian/`. The GUI and CLI are kept in one package on
+every supported distribution.
 
 ## Upstream and license
 

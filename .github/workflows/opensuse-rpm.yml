@@ -1,11 +1,13 @@
 # SPDX-FileCopyrightText: 2026 PhoenixEmik <phoenix0919mik@gmail.com>
 # SPDX-License-Identifier: BSD-3-Clause
 
-name: Build and release openSUSE RPM
+name: Build and release Linux packages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - ci/**
     paths-ignore:
       - README.md
       - docs/**
@@ -63,7 +65,7 @@ jobs:
 
           version="$base"
           release=false
-          if [[ "$GITHUB_EVENT_NAME" != "pull_request" ]]; then
+          if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             major="${BASH_REMATCH[1]}"
             minor="${BASH_REMATCH[2]}"
             patch="${BASH_REMATCH[3]}"
@@ -82,7 +84,7 @@ jobs:
           echo "release=$release" >> "$GITHUB_OUTPUT"
           echo "Building kgamma2 $version (release: $release)"
 
-  rpm:
+  opensuse-rpm:
     needs: version
     runs-on: ubuntu-latest
     container:
@@ -125,7 +127,7 @@ jobs:
             -ba packaging/opensuse/kgamma2.spec
           mkdir -p dist
           cp "$topdir"/RPMS/*/*.rpm "$topdir"/SRPMS/*.rpm dist/
-          sha256sum dist/*.rpm > dist/SHA256SUMS
+          sha256sum dist/*.rpm > dist/SHA256SUMS-opensuse-tumbleweed
 
       - name: Upload RPMs
         uses: actions/upload-artifact@v4
@@ -135,25 +137,174 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  fedora-rpm:
+    needs: version
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:45
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Install packaging tools
+        run: dnf --assumeyes install git rpm-build tar gzip
+
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install build requirements from spec
+        run: |
+          set -euo pipefail
+          mapfile -t packages < <(rpmspec -q --buildrequires packaging/fedora/kgamma2.spec)
+          dnf --assumeyes install "${packages[@]}"
+
+      - name: Build and test RPM
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          sed -i -E "s/^(Version:[[:space:]]*).*/\1$VERSION/" packaging/fedora/kgamma2.spec
+          test "$(rpmspec -q --qf '%{VERSION}\n' packaging/fedora/kgamma2.spec)" = "$VERSION"
+          topdir="$RUNNER_TEMP/kgamma2-fedora-rpmbuild"
+          mkdir -p "$topdir"/{BUILD,RPMS,SOURCES,SPECS,SRPMS,tmp}
+          tar --exclude-vcs --exclude=build --exclude=dist \
+            --transform="s|^./|kgamma2-$VERSION/|" \
+            -czf "$topdir/SOURCES/kgamma2-$VERSION.tar.gz" .
+          rpmbuild --define "_topdir $topdir" --define "_tmppath $topdir/tmp" \
+            -ba packaging/fedora/kgamma2.spec
+          mkdir -p dist
+          cp "$topdir"/RPMS/*/*.rpm "$topdir"/SRPMS/*.rpm dist/
+          sha256sum dist/*.rpm > dist/SHA256SUMS-fedora-45
+
+      - name: Upload RPMs
+        uses: actions/upload-artifact@v4
+        with:
+          name: kgamma2-${{ needs.version.outputs.version }}-fedora-45-x86_64
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+
+  ubuntu-deb:
+    needs: version
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:26.04
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Install packaging tools and dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends \
+            ca-certificates cmake debhelper desktop-file-utils dpkg-dev \
+            extra-cmake-modules g++ git libkf6config-dev libkf6i18n-dev \
+            libkirigami-dev libkscreen-dev liblcms2-dev pkgconf \
+            qt6-base-dev qt6-declarative-dev
+
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Build and test DEB
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          sed -i -E "1s/\([^)]*\)/($VERSION)/" debian/changelog
+          test "$(dpkg-parsechangelog -SVersion)" = "$VERSION"
+          dpkg-buildpackage --build=binary --no-sign
+          mkdir -p dist
+          find .. -maxdepth 1 -type f -name '*.deb' -exec cp '{}' dist/ \;
+          sha256sum dist/*.deb > dist/SHA256SUMS-ubuntu-26.04
+
+      - name: Upload DEBs
+        uses: actions/upload-artifact@v4
+        with:
+          name: kgamma2-${{ needs.version.outputs.version }}-ubuntu-26.04-amd64
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+
+  arch-package:
+    needs: version
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Install packaging tools and dependencies
+        run: |
+          pacman -Syu --noconfirm --needed \
+            base-devel cmake extra-cmake-modules git kconfig ki18n kirigami \
+            libkscreen lcms2 desktop-file-utils qt6-base qt6-declarative
+
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Build and test Arch package
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          package_root="$RUNNER_TEMP/kgamma2-arch-package"
+          mkdir -p "$package_root"
+          tar --exclude-vcs --exclude=build --exclude=dist \
+            --transform="s|^./|kgamma2-$VERSION/|" \
+            -czf "$package_root/kgamma2-$VERSION.tar.gz" .
+          checksum="$(sha256sum "$package_root/kgamma2-$VERSION.tar.gz" | cut -d' ' -f1)"
+          sed -e "s/@VERSION@/$VERSION/g" -e "s/@SHA256@/$checksum/g" \
+            packaging/arch/PKGBUILD.in > "$package_root/PKGBUILD"
+          useradd --create-home builder
+          chown -R builder:builder "$package_root"
+          su builder -c "cd '$package_root' && makepkg --cleanbuild --noconfirm"
+          mkdir -p dist
+          cp "$package_root"/*.pkg.tar.zst dist/
+          sha256sum dist/*.pkg.tar.zst > dist/SHA256SUMS-arch-linux
+
+      - name: Upload Arch packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: kgamma2-${{ needs.version.outputs.version }}-arch-linux-x86_64
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+
   release:
     if: needs.version.outputs.release == 'true'
-    needs: [version, rpm]
+    needs: [version, opensuse-rpm, fedora-rpm, ubuntu-deb, arch-package]
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-      - name: Download RPM artifact
+      - name: Download package artifacts
         uses: actions/download-artifact@v4
         with:
-          name: kgamma2-${{ needs.version.outputs.version }}-opensuse-tumbleweed-x86_64
+          pattern: kgamma2-${{ needs.version.outputs.version }}-*
           path: dist
+          merge-multiple: true
 
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.version.outputs.tag }}
         run: |
+          find dist -maxdepth 1 -type f ! -name 'SHA256SUMS*' -print0 \
+            | sort -z | xargs -0 sha256sum > dist/SHA256SUMS
+          rm -f dist/SHA256SUMS-*
           gh release create "$TAG" dist/* \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
