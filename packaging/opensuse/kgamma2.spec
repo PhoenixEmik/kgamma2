@@ -9,6 +9,7 @@ License:        LGPL-2.1-or-later AND BSD-3-Clause AND CC-BY-SA-4.0 AND CC0-1.0
 URL:            https://github.com/PhoenixEmik/kgamma2
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  cmake
+BuildRequires:  desktop-file-utils
 BuildRequires:  gcc-c++
 BuildRequires:  kf6-extra-cmake-modules
 BuildRequires:  kf6-kconfig-devel
@@ -43,5 +44,6 @@ and KScreen on KDE Plasma Wayland.
 %license LICENSES/*
 %doc README.md
 %{_bindir}/kgamma2
+%{_datadir}/applications/kgamma2.desktop
 
 %changelog

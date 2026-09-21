@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("kgamma2"));
+    app.setDesktopFileName(QStringLiteral("kgamma2"));
     app.setOrganizationName(QStringLiteral("kgamma2"));
     QQmlApplicationEngine engine;
     KLocalization::setupLocalizedContext(&engine);

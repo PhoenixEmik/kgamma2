@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: 2026 PhoenixEmik <phoenix0919mik@gmail.com>
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+[Desktop Entry]
+Type=Application
+Name=Wayland Gamma
+GenericName=Monitor Gamma Correction
+Comment=Adjust gamma and color channels for each monitor
+Exec=kgamma2
+Icon=preferences-desktop-display-color
+Terminal=false
+Categories=Settings;HardwareSettings;Qt;KDE;
+Keywords=gamma;color;display;monitor;ICC;Wayland;
+StartupNotify=true

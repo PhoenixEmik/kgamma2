@@ -76,9 +76,14 @@ target_link_libraries(kgamma2
 )
 
 install(TARGETS kgamma2 ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
+install(FILES data/kgamma2.desktop DESTINATION ${KDE_INSTALL_APPDIR})
 
 include(CTest)
 if(BUILD_TESTING)
+    find_program(DESKTOP_FILE_VALIDATE_EXECUTABLE desktop-file-validate)
+    if(DESKTOP_FILE_VALIDATE_EXECUTABLE)
+        add_test(NAME desktopfiletest COMMAND ${DESKTOP_FILE_VALIDATE_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/data/kgamma2.desktop)
+    endif()
     add_executable(profilemanager_test tests/profilemanager_test.cpp)
     target_link_libraries(profilemanager_test PRIVATE kgamma2_core)
     add_test(NAME profilemanager_test COMMAND profilemanager_test)
