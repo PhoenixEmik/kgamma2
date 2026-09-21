@@ -144,7 +144,7 @@ creates a `vX.Y.Z` tag and GitHub Release, and attaches the binary packages,
 source RPMs, debug RPMs, and SHA-256 checksums. Manual runs can increment the
 patch, minor, or major version. Pull requests and `ci/**` branches only produce
 temporary build artifacts. Pushes that only change `README.md`, `docs/`, or
-workflow files do not create a new version.
+both do not create a new version.
 
 Distribution packaging lives in `packaging/opensuse/`, `packaging/fedora/`,
 `packaging/arch/`, and `debian/`. The GUI and CLI are kept in one package on

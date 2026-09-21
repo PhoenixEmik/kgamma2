@@ -11,7 +11,6 @@ on:
     paths-ignore:
       - README.md
       - docs/**
-      - .github/**
   pull_request:
   workflow_dispatch:
     inputs:
@@ -127,7 +126,8 @@ jobs:
             -ba packaging/opensuse/kgamma2.spec
           mkdir -p dist
           cp "$topdir"/RPMS/*/*.rpm "$topdir"/SRPMS/*.rpm dist/
-          sha256sum dist/*.rpm > dist/SHA256SUMS-opensuse-tumbleweed
+          cd dist
+          sha256sum ./*.rpm > SHA256SUMS-opensuse-tumbleweed
 
       - name: Upload RPMs
         uses: actions/upload-artifact@v4
@@ -177,7 +177,8 @@ jobs:
             -ba packaging/fedora/kgamma2.spec
           mkdir -p dist
           cp "$topdir"/RPMS/*/*.rpm "$topdir"/SRPMS/*.rpm dist/
-          sha256sum dist/*.rpm > dist/SHA256SUMS-fedora-45
+          cd dist
+          sha256sum ./*.rpm > SHA256SUMS-fedora-45
 
       - name: Upload RPMs
         uses: actions/upload-artifact@v4
@@ -231,7 +232,8 @@ jobs:
           fi
           mkdir -p dist
           find .. -maxdepth 1 -type f -name '*.deb' -exec cp '{}' dist/ \;
-          sha256sum dist/*.deb > dist/SHA256SUMS-ubuntu-26.04
+          cd dist
+          sha256sum ./*.deb > SHA256SUMS-ubuntu-26.04
 
       - name: Upload DEBs
         uses: actions/upload-artifact@v4
@@ -280,7 +282,8 @@ jobs:
           su builder -c "cd '$package_root' && makepkg --cleanbuild --noconfirm"
           mkdir -p dist
           cp "$package_root"/*.pkg.tar.zst dist/
-          sha256sum dist/*.pkg.tar.zst > dist/SHA256SUMS-arch-linux
+          cd dist
+          sha256sum ./*.pkg.tar.zst > SHA256SUMS-arch-linux
 
       - name: Upload Arch packages
         uses: actions/upload-artifact@v4
@@ -310,10 +313,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.version.outputs.tag }}
         run: |
-          find dist -maxdepth 1 -type f ! -name 'SHA256SUMS*' -print0 \
-            | sort -z | xargs -0 sha256sum > dist/SHA256SUMS
-          rm -f dist/SHA256SUMS-*
-          gh release create "$TAG" dist/* \
+          cd dist
+          find . -maxdepth 1 -type f ! -name 'SHA256SUMS*' -printf '%f\0' \
+            | sort -z | xargs -0 sha256sum > SHA256SUMS
+          rm -f SHA256SUMS-*
+          gh release create "$TAG" ./* \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --title "kgamma2 $TAG" \
