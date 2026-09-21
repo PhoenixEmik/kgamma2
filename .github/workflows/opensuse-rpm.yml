@@ -220,7 +220,15 @@ jobs:
           set -euo pipefail
           sed -i -E "1s/\([^)]*\)/($VERSION)/" debian/changelog
           test "$(dpkg-parsechangelog -SVersion)" = "$VERSION"
-          dpkg-buildpackage --build=binary --no-sign
+          if ! dpkg-buildpackage --build=binary --no-sign 2>&1 \
+            | tee "$RUNNER_TEMP/ubuntu-build.log"; then
+            message="$(tail -n 80 "$RUNNER_TEMP/ubuntu-build.log")"
+            message="${message//'%'/'%25'}"
+            message="${message//$'\r'/'%0D'}"
+            message="${message//$'\n'/'%0A'}"
+            echo "::error title=Ubuntu package build failed::$message"
+            exit 1
+          fi
           mkdir -p dist
           find .. -maxdepth 1 -type f -name '*.deb' -exec cp '{}' dist/ \;
           sha256sum dist/*.deb > dist/SHA256SUMS-ubuntu-26.04
