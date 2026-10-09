@@ -8,27 +8,19 @@ on:
     branches:
       - main
       - ci/**
+    tags:
+      - v*
     paths-ignore:
       - README.md
       - docs/**
   pull_request:
   workflow_dispatch:
-    inputs:
-      bump:
-        description: Version component to increment
-        required: true
-        default: patch
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'release' }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -48,39 +40,17 @@ jobs:
 
       - name: Calculate version
         id: version
-        env:
-          REQUESTED_BUMP: ${{ inputs.bump || 'patch' }}
         run: |
           set -euo pipefail
-          base="$(awk '$1 == "Version:" { print $2; exit }' packaging/opensuse/kgamma2.spec)"
-          latest_tag="$(git tag --list 'v*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)"
-          head_tag="$(git tag --points-at "$GITHUB_SHA" --list 'v*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)"
-          if [[ -n "$latest_tag" ]]; then
-            base="${latest_tag#v}"
-          fi
-          if [[ ! "$base" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-            echo "Invalid base version: $base" >&2
-            exit 1
-          fi
-
-          version="$base"
+          version="$(awk '$1 == "Version:" { print $2; exit }' packaging/opensuse/kgamma2.spec)"
           release=false
-          if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            if [[ -n "$head_tag" && "$GITHUB_EVENT_NAME" == "push" ]]; then
-              version="${head_tag#v}"
-            else
-              major="${BASH_REMATCH[1]}"
-              minor="${BASH_REMATCH[2]}"
-              patch="${BASH_REMATCH[3]}"
-              case "$REQUESTED_BUMP" in
-                major) major=$((major + 1)); minor=0; patch=0 ;;
-                minor) minor=$((minor + 1)); patch=0 ;;
-                patch) patch=$((patch + 1)) ;;
-                *) echo "Unknown version component: $REQUESTED_BUMP" >&2; exit 1 ;;
-              esac
-              version="$major.$minor.$patch"
-            fi
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            version="${GITHUB_REF#refs/tags/v}"
             release=true
+          fi
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid release version: $version" >&2
+            exit 1
           fi
 
           echo "version=$version" >> "$GITHUB_OUTPUT"
@@ -325,8 +295,12 @@ jobs:
           find . -maxdepth 1 -type f ! -name 'SHA256SUMS*' -printf '%f\0' \
             | sort -z | xargs -0 sha256sum > SHA256SUMS
           rm -f SHA256SUMS-*
-          gh release create "$TAG" ./* \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$GITHUB_SHA" \
-            --title "kgamma2 $TAG" \
-            --generate-notes
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" ./* --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$TAG" ./* \
+              --repo "$GITHUB_REPOSITORY" \
+              --verify-tag \
+              --title "kgamma2 $TAG" \
+              --generate-notes
+          fi

@@ -139,12 +139,13 @@ profile from it.
 
 The [Linux package workflow](.github/workflows/linux-packages.yml) builds and
 tests packages in native openSUSE Tumbleweed, Fedora 45, Ubuntu 26.04, and Arch
-Linux environments. A successful push to `main` increments the patch version,
-creates a `vX.Y.Z` tag and GitHub Release, and attaches the binary packages,
-source RPMs, debug RPMs, and SHA-256 checksums. Manual runs can increment the
-patch, minor, or major version. Pull requests and `ci/**` branches only produce
-temporary build artifacts. Pushes that only change `README.md`, `docs/`, or
-both do not create a new version.
+Linux environments. Pushing an explicit `vX.Y.Z` tag builds that version and
+publishes a GitHub Release with binary packages, source RPMs, debug RPMs, and
+SHA-256 checksums. Repushing a tag refreshes its release assets. Branch pushes,
+pull requests, and manual runs build the version in the packaging metadata
+and only produce temporary build artifacts. CI does not increment versions
+or create tags. Branch pushes that only change `README.md`, `docs/`, or both
+do not trigger a build.
 
 Distribution packaging lives in `packaging/opensuse/`, `packaging/fedora/`,
 `packaging/arch/`, and `debian/`. The GUI and CLI are kept in one package on
