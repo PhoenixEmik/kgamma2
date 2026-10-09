@@ -11,6 +11,7 @@ Build-Depends:
  libkf6config-dev,
  libkf6i18n-dev,
  libkirigami-dev,
+ libkscreen-bin,
  libkscreen-dev,
  liblcms2-dev,
  pkgconf,

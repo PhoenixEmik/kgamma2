@@ -16,6 +16,7 @@ BuildRequires:  kf6-kconfig-devel
 BuildRequires:  kf6-ki18n-devel
 BuildRequires:  kf6-kirigami-devel
 BuildRequires:  libkscreen6-devel
+BuildRequires:  libkscreen6-plugin
 BuildRequires:  liblcms2-devel
 BuildRequires:  pkgconfig
 BuildRequires:  qt6-core-devel
