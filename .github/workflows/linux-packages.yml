@@ -100,7 +100,10 @@ jobs:
     steps:
       - name: Install packaging tools
         run: |
-          zypper --non-interactive --gpg-auto-import-keys install --no-recommends \
+          set -euo pipefail
+          # Align the rolling container image with the repository snapshot.
+          zypper --non-interactive --gpg-auto-import-keys dist-upgrade --allow-downgrade --no-recommends
+          zypper --non-interactive --gpg-auto-import-keys --no-refresh install --allow-downgrade --no-recommends \
             git rpm-build make tar gzip
 
       - name: Check out source
@@ -113,7 +116,7 @@ jobs:
           set -euo pipefail
           rpmspec -q --buildrequires packaging/opensuse/kgamma2.spec > "$RUNNER_TEMP/build-requires.txt"
           mapfile -t packages < "$RUNNER_TEMP/build-requires.txt"
-          zypper --non-interactive --gpg-auto-import-keys install --no-recommends "${packages[@]}"
+          zypper --non-interactive --gpg-auto-import-keys --no-refresh install --allow-downgrade --no-recommends "${packages[@]}"
 
       - name: Build and test RPM
         env:
