@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 3.21)
 
-set(KGAMMA2_VERSION "0.1.0" CACHE STRING "kgamma2 version")
+set(KGAMMA2_VERSION "0.1.6" CACHE STRING "kgamma2 version")
 project(kgamma_wayland VERSION ${KGAMMA2_VERSION} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -83,6 +83,7 @@ install(FILES data/icons/kgamma2.svg DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/
 
 include(CTest)
 if(BUILD_TESTING)
+    find_package(Qt6 REQUIRED COMPONENTS DBus)
     find_program(DESKTOP_FILE_VALIDATE_EXECUTABLE desktop-file-validate)
     if(DESKTOP_FILE_VALIDATE_EXECUTABLE)
         add_test(NAME desktopfiletest COMMAND ${DESKTOP_FILE_VALIDATE_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/data/kgamma2.desktop)
@@ -93,4 +94,12 @@ if(BUILD_TESTING)
     add_executable(presetmanager_test tests/presetmanager_test.cpp)
     target_link_libraries(presetmanager_test PRIVATE kgamma2_core)
     add_test(NAME presetmanager_test COMMAND presetmanager_test)
+    add_executable(correctionsettings_test
+        tests/correctionsettings_test.cpp
+        src/gui/correctionsettings.cpp
+        src/gui/correctionsettings.h
+    )
+    target_include_directories(correctionsettings_test PRIVATE src/gui)
+    target_link_libraries(correctionsettings_test PRIVATE kgamma2_core Qt6::DBus)
+    add_test(NAME correctionsettings_test COMMAND correctionsettings_test)
 endif()

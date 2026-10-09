@@ -54,6 +54,7 @@ jobs:
           set -euo pipefail
           base="$(awk '$1 == "Version:" { print $2; exit }' packaging/opensuse/kgamma2.spec)"
           latest_tag="$(git tag --list 'v*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)"
+          head_tag="$(git tag --points-at "$GITHUB_SHA" --list 'v*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)"
           if [[ -n "$latest_tag" ]]; then
             base="${latest_tag#v}"
           fi
@@ -65,16 +66,20 @@ jobs:
           version="$base"
           release=false
           if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            major="${BASH_REMATCH[1]}"
-            minor="${BASH_REMATCH[2]}"
-            patch="${BASH_REMATCH[3]}"
-            case "$REQUESTED_BUMP" in
-              major) major=$((major + 1)); minor=0; patch=0 ;;
-              minor) minor=$((minor + 1)); patch=0 ;;
-              patch) patch=$((patch + 1)) ;;
-              *) echo "Unknown version component: $REQUESTED_BUMP" >&2; exit 1 ;;
-            esac
-            version="$major.$minor.$patch"
+            if [[ -n "$head_tag" && "$GITHUB_EVENT_NAME" == "push" ]]; then
+              version="${head_tag#v}"
+            else
+              major="${BASH_REMATCH[1]}"
+              minor="${BASH_REMATCH[2]}"
+              patch="${BASH_REMATCH[3]}"
+              case "$REQUESTED_BUMP" in
+                major) major=$((major + 1)); minor=0; patch=0 ;;
+                minor) minor=$((minor + 1)); patch=0 ;;
+                patch) patch=$((patch + 1)) ;;
+                *) echo "Unknown version component: $REQUESTED_BUMP" >&2; exit 1 ;;
+              esac
+              version="$major.$minor.$patch"
+            fi
             release=true
           fi
 

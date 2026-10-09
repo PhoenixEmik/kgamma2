@@ -151,8 +151,10 @@ bool CorrectionSettings::savePresetAs(const QString &name)
     return saveNamedPreset(name);
 }
 
-bool CorrectionSettings::saveNamedPreset(const QString &name)
+bool CorrectionSettings::saveNamedPreset(QString name)
 {
+    // Own the name: savePreset() passes an element of m_presetNames, which
+    // reloadPresets() replaces before the final selection lookup.
     if (m_statuses.isEmpty()) { setError(QStringLiteral("No connected outputs to save")); return false; }
     auto preset = PresetManager::capture(name, m_statuses);
     if (m_selectedScreenIndex >= 0 && m_selectedScreenIndex < preset.outputs.size()) {

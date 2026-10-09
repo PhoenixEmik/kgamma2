@@ -59,7 +59,7 @@ private:
     void reload();
     void reloadPresets();
     void updateDraftModified();
-    bool saveNamedPreset(const QString &name);
+    bool saveNamedPreset(QString name);
     void setError(const QString &error);
     GammaController m_controller;
     PresetManager m_presets;

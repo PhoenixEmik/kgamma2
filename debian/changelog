@@ -1,3 +1,10 @@
+kgamma2 (0.1.6) unstable; urgency=medium
+
+  * Fix a use-after-free when saving an existing preset.
+  * Add regression coverage for repeated preset saves.
+
+ -- PhoenixEmik <phoenix0919mik@gmail.com>  Sat, 10 Oct 2026 04:30:00 +0800
+
 kgamma2 (0.1.0) unstable; urgency=medium
 
   * Add a native package for Ubuntu 26.04.
