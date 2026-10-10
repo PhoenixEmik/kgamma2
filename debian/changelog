@@ -1,3 +1,10 @@
+kgamma2 (0.1.8) unstable; urgency=medium
+
+  * Fix the default window size so all monitor controls remain visible.
+  * Show About in an independent popup window.
+
+ -- PhoenixEmik <phoenix0919mik@gmail.com>  Sat, 10 Oct 2026 12:41:23 +0000
+
 kgamma2 (0.1.7) unstable; urgency=medium
 
   * Add an About page with version, license, project links, and author credits.
