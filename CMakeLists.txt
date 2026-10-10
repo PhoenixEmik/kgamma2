@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 3.21)
 
-set(KGAMMA2_VERSION "0.1.6" CACHE STRING "kgamma2 version")
+set(KGAMMA2_VERSION "0.1.7" CACHE STRING "kgamma2 version")
 project(kgamma_wayland VERSION ${KGAMMA2_VERSION} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -61,6 +61,19 @@ qt_add_qml_module(kgamma2
     VERSION 1.0
     QML_FILES
         qml/Main.qml
+        qml/AboutPage.qml
+)
+
+qt_add_resources(kgamma2 "licenses"
+    PREFIX "/licenses"
+    BASE "LICENSES"
+    FILES LICENSES/LGPL-2.1-or-later.txt
+)
+
+qt_add_resources(kgamma2 "icons"
+    PREFIX "/icons"
+    BASE "data/icons"
+    FILES data/icons/kgamma2.svg
 )
 
 target_link_libraries(kgamma2
