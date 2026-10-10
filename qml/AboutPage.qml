@@ -13,7 +13,7 @@ Kirigami.AboutPage {
     objectName: "aboutPage"
     title: i18n("About kgamma2")
 
-    signal returnRequested()
+    signal closeRequested()
 
     aboutData: ({
         displayName: "kgamma2",
@@ -55,10 +55,10 @@ Kirigami.AboutPage {
         RowLayout {
             anchors.fill: parent
             ToolButton {
-                objectName: "aboutBackButton"
-                text: i18n("Back")
-                icon.name: "go-previous"
-                onClicked: page.returnRequested()
+                objectName: "aboutCloseButton"
+                text: i18n("Close")
+                icon.name: "window-close"
+                onClicked: page.closeRequested()
             }
             Item { Layout.fillWidth: true }
             ToolButton {

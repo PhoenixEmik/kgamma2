@@ -62,6 +62,7 @@ qt_add_qml_module(kgamma2
     QML_FILES
         qml/Main.qml
         qml/AboutPage.qml
+        qml/AboutWindow.qml
 )
 
 qt_add_resources(kgamma2 "licenses"

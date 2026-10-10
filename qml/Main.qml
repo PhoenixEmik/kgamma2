@@ -40,11 +40,9 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    Component {
-        id: aboutPage
-        AboutPage {
-            onReturnRequested: window.pageStack.pop()
-        }
+    AboutWindow {
+        id: aboutWindow
+        transientParent: window
     }
 
     pageStack.initialPage: Kirigami.Page {
@@ -66,7 +64,11 @@ Kirigami.ApplicationWindow {
                     objectName: "aboutButton"
                     text: i18n("About")
                     icon.name: "help-about"
-                    onClicked: window.pageStack.push(aboutPage)
+                    onClicked: {
+                        aboutWindow.show()
+                        aboutWindow.raise()
+                        aboutWindow.requestActivate()
+                    }
                 }
             }
 
