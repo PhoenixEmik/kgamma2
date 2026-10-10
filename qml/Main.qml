@@ -13,13 +13,14 @@ Kirigami.ApplicationWindow {
     id: window
 
     width: 620
-    height: 350
+    height: Math.max(480, minimumHeight)
     visible: true
     title: i18n("Wayland Gamma")
     pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
 
     minimumWidth: 500
-    minimumHeight: mainLayout.implicitHeight + Kirigami.Units.largeSpacing * 2
+    minimumHeight: Math.ceil(mainLayout.implicitHeight + Kirigami.Units.largeSpacing * 2
+        + mainPage.topPadding + mainPage.bottomPadding)
 
     Dialog {
         id: saveAsDialog
@@ -47,6 +48,7 @@ Kirigami.ApplicationWindow {
     }
 
     pageStack.initialPage: Kirigami.Page {
+        id: mainPage
         ColumnLayout {
             id: mainLayout
             anchors.fill: parent
@@ -248,6 +250,7 @@ Kirigami.ApplicationWindow {
                 }
 
                 Button {
+                    objectName: "applyChangesButton"
                     text: i18n("Apply Changes")
                     highlighted: true
                     enabled: correctionSettings.screenNames.length > 0
