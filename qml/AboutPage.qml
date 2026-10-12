@@ -8,14 +8,14 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
-Kirigami.AboutPage {
+Kirigami.ScrollablePage {
     id: page
     objectName: "aboutPage"
     title: i18n("About kgamma2")
 
     signal closeRequested()
 
-    aboutData: ({
+    readonly property var aboutData: ({
         displayName: "kgamma2",
         componentName: "kgamma2",
         desktopFileName: "kgamma2",
@@ -30,15 +30,15 @@ Kirigami.AboutPage {
             {
                 name: "PhoenixEmik",
                 task: i18n("Maintainer"),
-                emailAddress: "phoenix0919mik@gmail.com",
+                emailAddress: "",
                 webAddress: "https://github.com/PhoenixEmik",
                 ocsUsername: ""
             },
             {
                 name: "David Edmundson",
                 task: i18n("Original author"),
-                emailAddress: "davidedmundson@kde.org",
-                webAddress: "https://invent.kde.org/davidedmundson/kgamma2",
+                emailAddress: "",
+                webAddress: "",
                 ocsUsername: ""
             }
         ],
@@ -51,6 +51,107 @@ Kirigami.AboutPage {
         }]
     })
 
+    ColumnLayout {
+        spacing: Kirigami.Units.largeSpacing
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Kirigami.Units.largeSpacing
+            Kirigami.Icon {
+                source: page.aboutData.programLogo
+                Layout.preferredWidth: Kirigami.Units.iconSizes.huge
+                Layout.preferredHeight: Kirigami.Units.iconSizes.huge
+            }
+            ColumnLayout {
+                Layout.fillWidth: true
+                Kirigami.Heading {
+                    Layout.fillWidth: true
+                    text: page.aboutData.displayName + " " + page.aboutData.version
+                    wrapMode: Text.Wrap
+                }
+                Label {
+                    Layout.fillWidth: true
+                    text: page.aboutData.shortDescription
+                    wrapMode: Text.Wrap
+                }
+            }
+        }
+
+        Label {
+            Layout.fillWidth: true
+            text: page.aboutData.copyrightStatement
+            wrapMode: Text.Wrap
+        }
+
+        Kirigami.Heading { text: i18n("License"); level: 2 }
+        Button {
+            objectName: "licenseButton"
+            Layout.fillWidth: true
+            text: page.aboutData.licenses[0].name
+            onClicked: licenseDialog.open()
+        }
+
+        Kirigami.Heading { text: i18n("Project links"); level: 2 }
+        Button {
+            objectName: "homepageButton"
+            Layout.fillWidth: true
+            text: i18n("Homepage")
+            icon.name: "globe"
+            onClicked: Qt.openUrlExternally(page.aboutData.homepage)
+        }
+        Button {
+            objectName: "reportBugButton"
+            Layout.fillWidth: true
+            text: i18n("Report a bug")
+            icon.name: "tools-report-bug"
+            onClicked: Qt.openUrlExternally(page.aboutData.bugAddress)
+        }
+
+        Kirigami.Heading { text: i18n("Authors"); level: 2 }
+        Repeater {
+            model: page.aboutData.authors
+            delegate: ColumnLayout {
+                required property var modelData
+                Layout.fillWidth: true
+                Label { text: modelData.name }
+                Label {
+                    Layout.fillWidth: true
+                    text: modelData.task
+                    opacity: 0.7
+                    wrapMode: Text.Wrap
+                }
+            }
+        }
+
+        Kirigami.Heading { text: i18n("Libraries in use"); level: 2 }
+        Label {
+            Layout.fillWidth: true
+            text: i18n("Qt %1", qtVersion)
+            wrapMode: Text.Wrap
+        }
+    }
+
+    Dialog {
+        id: licenseDialog
+        objectName: "licenseDialog"
+        title: page.aboutData.licenses[0].name
+        parent: Overlay.overlay
+        anchors.centerIn: parent
+        width: Math.min(600, parent.width - Kirigami.Units.largeSpacing * 2)
+        height: Math.min(500, parent.height - Kirigami.Units.largeSpacing * 2)
+        modal: true
+        standardButtons: Dialog.Close
+        contentItem: ScrollView {
+            clip: true
+            TextArea {
+                text: page.aboutData.licenses[0].text
+                readOnly: true
+                selectByMouse: true
+                wrapMode: Text.Wrap
+            }
+        }
+    }
+
     footer: ToolBar {
         RowLayout {
             anchors.fill: parent
@@ -61,11 +162,6 @@ Kirigami.AboutPage {
                 onClicked: page.closeRequested()
             }
             Item { Layout.fillWidth: true }
-            ToolButton {
-                text: i18n("GitHub repository")
-                icon.name: "vcs-branch"
-                onClicked: Qt.openUrlExternally(page.aboutData.homepage)
-            }
         }
     }
 }

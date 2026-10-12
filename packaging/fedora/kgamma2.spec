@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 Name:           kgamma2
-Version:        0.1.8
+Version:        0.1.9
 Release:        1%{?dist}
 Summary:        Per-monitor gamma adjustment for KDE Plasma Wayland
 

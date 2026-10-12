@@ -1,3 +1,10 @@
+kgamma2 (0.1.9) unstable; urgency=medium
+
+  * Open only GitHub Issues when reporting a bug.
+  * Remove author email actions, upstream links, and duplicate repository link.
+
+ -- PhoenixEmik <phoenix0919mik@gmail.com>  Mon, 12 Oct 2026 23:30:53 +0000
+
 kgamma2 (0.1.8) unstable; urgency=medium
 
   * Fix the default window size so all monitor controls remain visible.

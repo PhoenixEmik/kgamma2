@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
     app.setWindowIcon(QIcon::fromTheme(QStringLiteral("kgamma2"), QIcon(QStringLiteral(":/icons/kgamma2.svg"))));
     QQmlApplicationEngine engine;
     KLocalization::setupLocalizedContext(&engine);
+    engine.rootContext()->setContextProperty(QStringLiteral("qtVersion"), QString::fromLatin1(qVersion()));
     CorrectionSettings settings;
     engine.rootContext()->setContextProperty(QStringLiteral("correctionSettings"), &settings);
     QFile license(QStringLiteral(":/licenses/LGPL-2.1-or-later.txt"));
