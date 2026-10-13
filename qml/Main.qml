@@ -13,14 +13,13 @@ Kirigami.ApplicationWindow {
     id: window
 
     width: 620
-    height: Math.max(480, minimumHeight)
+    height: minimumHeight + Kirigami.Units.largeSpacing * 2
     visible: true
     title: i18n("Wayland Gamma")
     pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
 
     minimumWidth: 500
-    minimumHeight: Math.ceil(mainLayout.implicitHeight + Kirigami.Units.largeSpacing * 2
-        + mainPage.topPadding + mainPage.bottomPadding)
+    minimumHeight: Math.ceil(mainLayout.implicitHeight + mainPage.topPadding + mainPage.bottomPadding)
 
     Dialog {
         id: saveAsDialog
@@ -47,10 +46,10 @@ Kirigami.ApplicationWindow {
 
     pageStack.initialPage: Kirigami.Page {
         id: mainPage
+        padding: Kirigami.Units.largeSpacing * 2
         ColumnLayout {
             id: mainLayout
             anchors.fill: parent
-            anchors.margins: Kirigami.Units.largeSpacing
             spacing: Kirigami.Units.largeSpacing
 
             RowLayout {
@@ -59,6 +58,9 @@ Kirigami.ApplicationWindow {
                     Layout.fillWidth: true
                     text: i18n("Monitor correction")
                     level: 1
+                    font.weight: Font.Bold
+                    font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.6
+                    wrapMode: Text.Wrap
                 }
                 ToolButton {
                     objectName: "aboutButton"
@@ -73,8 +75,19 @@ Kirigami.ApplicationWindow {
             }
 
             GroupBox {
+                id: presetsGroup
                 title: i18n("Presets")
+                label: Kirigami.Heading {
+                    text: presetsGroup.title
+                    level: 3
+                    font.weight: Font.Bold
+                    font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.15
+                    wrapMode: Text.Wrap
+                    width: parent.availableWidth
+                }
                 Layout.fillWidth: true
+                padding: Kirigami.Units.largeSpacing
+                Layout.topMargin: Kirigami.Units.smallSpacing
 
                 contentItem: ColumnLayout {
                     spacing: Kirigami.Units.smallSpacing
@@ -108,15 +121,20 @@ Kirigami.ApplicationWindow {
                             Layout.fillWidth: true
                             text: i18n("Current: %1", correctionSettings.activePresetLabel)
                             elide: Text.ElideRight
+                            color: Kirigami.Theme.textColor
+                            opacity: 0.75
+                            ToolTip.text: text
+                            ToolTip.visible: presetStatusHover.hovered
+                            HoverHandler { id: presetStatusHover }
                         }
 
-                        Button {
+                        ToolButton {
                             text: i18n("Save")
                             enabled: correctionSettings.selectedPresetIndex >= 0
                             onClicked: correctionSettings.savePreset()
                         }
 
-                        Button {
+                        ToolButton {
                             text: i18n("Save As…")
                             enabled: correctionSettings.screenNames.length > 0
                             onClicked: {
@@ -125,7 +143,7 @@ Kirigami.ApplicationWindow {
                             }
                         }
 
-                        Button {
+                        ToolButton {
                             text: i18n("Delete")
                             enabled: correctionSettings.selectedPresetIndex >= 0
                             onClicked: correctionSettings.deletePreset()
@@ -135,8 +153,19 @@ Kirigami.ApplicationWindow {
             }
 
             GroupBox {
+                id: monitorGroup
                 title: i18n("Selected monitor")
+                label: Kirigami.Heading {
+                    text: monitorGroup.title
+                    level: 3
+                    font.weight: Font.Bold
+                    font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.15
+                    wrapMode: Text.Wrap
+                    width: parent.availableWidth
+                }
                 Layout.fillWidth: true
+                padding: Kirigami.Units.largeSpacing
+                Layout.topMargin: Kirigami.Units.smallSpacing
 
                 contentItem: ColumnLayout {
                     spacing: Kirigami.Units.smallSpacing
@@ -164,9 +193,9 @@ Kirigami.ApplicationWindow {
                         Layout.fillWidth: true
                         columns: 3
                         columnSpacing: Kirigami.Units.smallSpacing
-                        rowSpacing: 0
+                        rowSpacing: Kirigami.Units.smallSpacing
 
-                        Label { text: i18n("Gamma"); Layout.preferredWidth: 70 }
+                        Label { text: i18n("Gamma"); Layout.preferredWidth: Kirigami.Units.gridUnit * 4 }
                         Slider {
                             Layout.fillWidth: true
                             from: -1.0
@@ -177,9 +206,20 @@ Kirigami.ApplicationWindow {
                             Accessible.name: i18n("Gamma")
                             onMoved: correctionSettings.gamma = Math.round(Math.pow(10, value) * 100) / 100
                         }
-                        Label { text: correctionSettings.gamma.toFixed(2); Layout.preferredWidth: 42; horizontalAlignment: Text.AlignRight }
+                        Label { text: correctionSettings.gamma.toFixed(2); Layout.preferredWidth: Kirigami.Units.gridUnit * 3; horizontalAlignment: Text.AlignRight; font.family: "monospace" }
 
-                        Label { text: i18n("Red"); Layout.preferredWidth: 70 }
+                        RowLayout {
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                            spacing: Kirigami.Units.smallSpacing
+                            Rectangle {
+                                width: Kirigami.Units.smallSpacing * 2
+                                height: width
+                                radius: width / 2
+                                color: "#da4453"
+                            }
+                            Label { text: i18n("Red") }
+                            Item { Layout.fillWidth: true }
+                        }
                         Slider {
                             Layout.fillWidth: true
                             from: 0.0
@@ -190,9 +230,20 @@ Kirigami.ApplicationWindow {
                             Accessible.name: i18n("Red")
                             onMoved: correctionSettings.red = value
                         }
-                        Label { text: correctionSettings.red.toFixed(2); Layout.preferredWidth: 42; horizontalAlignment: Text.AlignRight }
+                        Label { text: correctionSettings.red.toFixed(2); Layout.preferredWidth: Kirigami.Units.gridUnit * 3; horizontalAlignment: Text.AlignRight; font.family: "monospace" }
 
-                        Label { text: i18n("Green"); Layout.preferredWidth: 70 }
+                        RowLayout {
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                            spacing: Kirigami.Units.smallSpacing
+                            Rectangle {
+                                width: Kirigami.Units.smallSpacing * 2
+                                height: width
+                                radius: width / 2
+                                color: "#27ae60"
+                            }
+                            Label { text: i18n("Green") }
+                            Item { Layout.fillWidth: true }
+                        }
                         Slider {
                             Layout.fillWidth: true
                             from: 0.0
@@ -203,9 +254,20 @@ Kirigami.ApplicationWindow {
                             Accessible.name: i18n("Green")
                             onMoved: correctionSettings.green = value
                         }
-                        Label { text: correctionSettings.green.toFixed(2); Layout.preferredWidth: 42; horizontalAlignment: Text.AlignRight }
+                        Label { text: correctionSettings.green.toFixed(2); Layout.preferredWidth: Kirigami.Units.gridUnit * 3; horizontalAlignment: Text.AlignRight; font.family: "monospace" }
 
-                        Label { text: i18n("Blue"); Layout.preferredWidth: 70 }
+                        RowLayout {
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                            spacing: Kirigami.Units.smallSpacing
+                            Rectangle {
+                                width: Kirigami.Units.smallSpacing * 2
+                                height: width
+                                radius: width / 2
+                                color: "#3daee9"
+                            }
+                            Label { text: i18n("Blue") }
+                            Item { Layout.fillWidth: true }
+                        }
                         Slider {
                             Layout.fillWidth: true
                             from: 0.0
@@ -216,7 +278,7 @@ Kirigami.ApplicationWindow {
                             Accessible.name: i18n("Blue")
                             onMoved: correctionSettings.blue = value
                         }
-                        Label { text: correctionSettings.blue.toFixed(2); Layout.preferredWidth: 42; horizontalAlignment: Text.AlignRight }
+                        Label { text: correctionSettings.blue.toFixed(2); Layout.preferredWidth: Kirigami.Units.gridUnit * 3; horizontalAlignment: Text.AlignRight; font.family: "monospace" }
                     }
 
                     Label {
@@ -241,10 +303,13 @@ Kirigami.ApplicationWindow {
                 wrapMode: Text.Wrap
             }
 
+            Kirigami.Separator { Layout.fillWidth: true }
+
             RowLayout {
-                Layout.alignment: Qt.AlignRight
+                Layout.fillWidth: true
                 spacing: Kirigami.Units.smallSpacing
 
+                Item { Layout.fillWidth: true }
                 Button {
                     text: i18n("Reset")
                     enabled: correctionSettings.screenNames.length > 0

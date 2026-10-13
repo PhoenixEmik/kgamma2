@@ -51,12 +51,16 @@ Kirigami.ScrollablePage {
         }]
     })
 
+    readonly property real preferredHeight: aboutLayout.implicitHeight + topPadding + bottomPadding
+        + footer.implicitHeight + Kirigami.Units.largeSpacing * 2
+
     ColumnLayout {
-        spacing: Kirigami.Units.largeSpacing
+        id: aboutLayout
+        spacing: Kirigami.Units.largeSpacing * 2
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: Kirigami.Units.largeSpacing
+            spacing: Kirigami.Units.largeSpacing * 2
             Kirigami.Icon {
                 source: page.aboutData.programLogo
                 Layout.preferredWidth: Kirigami.Units.iconSizes.huge
@@ -64,10 +68,23 @@ Kirigami.ScrollablePage {
             }
             ColumnLayout {
                 Layout.fillWidth: true
-                Kirigami.Heading {
+                spacing: Kirigami.Units.smallSpacing
+                RowLayout {
                     Layout.fillWidth: true
-                    text: page.aboutData.displayName + " " + page.aboutData.version
-                    wrapMode: Text.Wrap
+                    Kirigami.Heading {
+                        text: page.aboutData.displayName
+                        level: 1
+                        font.weight: Font.Bold
+                        font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.6
+                        wrapMode: Text.Wrap
+                    }
+                    Label {
+                        text: page.aboutData.version
+                        color: Kirigami.Theme.textColor
+                        opacity: 0.75
+                        font.pointSize: Kirigami.Theme.defaultFont.pointSize
+                    }
+                    Item { Layout.fillWidth: true }
                 }
                 Label {
                     Layout.fillWidth: true
@@ -77,57 +94,116 @@ Kirigami.ScrollablePage {
             }
         }
 
-        Label {
+        GroupBox {
+            id: licenseGroup
+            title: i18n("License")
+            label: Kirigami.Heading {
+                text: licenseGroup.title
+                level: 3
+                font.weight: Font.Bold
+                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.15
+                wrapMode: Text.Wrap
+                width: parent.availableWidth
+            }
             Layout.fillWidth: true
-            text: page.aboutData.copyrightStatement
-            wrapMode: Text.Wrap
-        }
-
-        Kirigami.Heading { text: i18n("License"); level: 2 }
-        Button {
-            objectName: "licenseButton"
-            Layout.fillWidth: true
-            text: page.aboutData.licenses[0].name
-            onClicked: licenseDialog.open()
-        }
-
-        Kirigami.Heading { text: i18n("Project links"); level: 2 }
-        Button {
-            objectName: "homepageButton"
-            Layout.fillWidth: true
-            text: i18n("Homepage")
-            icon.name: "globe"
-            onClicked: Qt.openUrlExternally(page.aboutData.homepage)
-        }
-        Button {
-            objectName: "reportBugButton"
-            Layout.fillWidth: true
-            text: i18n("Report a bug")
-            icon.name: "tools-report-bug"
-            onClicked: Qt.openUrlExternally(page.aboutData.bugAddress)
-        }
-
-        Kirigami.Heading { text: i18n("Authors"); level: 2 }
-        Repeater {
-            model: page.aboutData.authors
-            delegate: ColumnLayout {
-                required property var modelData
-                Layout.fillWidth: true
-                Label { text: modelData.name }
-                Label {
+            padding: Kirigami.Units.largeSpacing
+            contentItem: RowLayout {
+                spacing: Kirigami.Units.largeSpacing
+                ColumnLayout {
                     Layout.fillWidth: true
-                    text: modelData.task
-                    opacity: 0.7
-                    wrapMode: Text.Wrap
+                    Label {
+                        Layout.fillWidth: true
+                        text: "LGPL-2.1-or-later"
+                        font.bold: true
+                        wrapMode: Text.Wrap
+                    }
+                    Label {
+                        Layout.fillWidth: true
+                        text: i18n("GNU Lesser General Public License")
+                        color: Kirigami.Theme.textColor
+                        opacity: 0.75
+                        wrapMode: Text.Wrap
+                    }
+                }
+                Button {
+                    objectName: "licenseButton"
+                    text: i18n("View license")
+                    onClicked: licenseDialog.open()
                 }
             }
         }
 
-        Kirigami.Heading { text: i18n("Libraries in use"); level: 2 }
-        Label {
+        RowLayout {
             Layout.fillWidth: true
-            text: i18n("Qt %1", qtVersion)
-            wrapMode: Text.Wrap
+            spacing: Kirigami.Units.largeSpacing
+            Button {
+                objectName: "homepageButton"
+                Layout.fillWidth: true
+                text: i18n("Homepage")
+                icon.name: "globe"
+                onClicked: Qt.openUrlExternally(page.aboutData.homepage)
+            }
+            Button {
+                objectName: "reportBugButton"
+                Layout.fillWidth: true
+                text: i18n("Report a bug")
+                icon.name: "tools-report-bug"
+                onClicked: Qt.openUrlExternally(page.aboutData.bugAddress)
+            }
+        }
+
+        GroupBox {
+            id: authorsGroup
+            title: i18n("Authors")
+            label: Kirigami.Heading {
+                text: authorsGroup.title
+                level: 3
+                font.weight: Font.Bold
+                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.15
+                wrapMode: Text.Wrap
+                width: parent.availableWidth
+            }
+            Layout.fillWidth: true
+            padding: Kirigami.Units.largeSpacing
+            contentItem: ColumnLayout {
+                spacing: Kirigami.Units.largeSpacing
+                Repeater {
+                    model: page.aboutData.authors
+                    delegate: RowLayout {
+                        required property var modelData
+                        Layout.fillWidth: true
+                        Label {
+                            Layout.fillWidth: true
+                            text: modelData.name
+                            wrapMode: Text.Wrap
+                        }
+                        Label {
+                            text: modelData.task
+                            color: Kirigami.Theme.textColor
+                            opacity: 0.75
+                        }
+                    }
+                }
+            }
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: Kirigami.Units.smallSpacing
+            Label {
+                Layout.fillWidth: true
+                text: page.aboutData.copyrightStatement
+                color: Kirigami.Theme.textColor
+                opacity: 0.75
+                wrapMode: Text.Wrap
+            }
+            Label {
+                Layout.fillWidth: true
+                text: i18n("Built with Qt %1", qtVersion)
+                color: Kirigami.Theme.textColor
+                opacity: 0.75
+                wrapMode: Text.Wrap
+            }
         }
     }
 
@@ -153,15 +229,21 @@ Kirigami.ScrollablePage {
     }
 
     footer: ToolBar {
-        RowLayout {
-            anchors.fill: parent
-            ToolButton {
+        leftPadding: Kirigami.Units.largeSpacing * 2
+        rightPadding: Kirigami.Units.largeSpacing * 2
+        topPadding: Kirigami.Units.largeSpacing
+        bottomPadding: Kirigami.Units.largeSpacing
+        implicitHeight: closeButton.implicitHeight + topPadding + bottomPadding
+
+        contentItem: RowLayout {
+            Item { Layout.fillWidth: true }
+            Button {
+                id: closeButton
                 objectName: "aboutCloseButton"
                 text: i18n("Close")
                 icon.name: "window-close"
                 onClicked: page.closeRequested()
             }
-            Item { Layout.fillWidth: true }
         }
     }
 }
