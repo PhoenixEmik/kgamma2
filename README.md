@@ -151,6 +151,31 @@ Distribution packaging lives in `packaging/opensuse/`, `packaging/fedora/`,
 `packaging/arch/`, and `debian/`. The GUI and CLI are kept in one package on
 every supported distribution.
 
+### Automatic OBS updates
+
+The [OBS source-service workflow](.github/workflows/obs-source-service.yml)
+triggers the source services for
+[`home:PhoenixEmik/kgamma2`](https://build.opensuse.org/package/show/home:PhoenixEmik/kgamma2)
+whenever a `v*` tag is pushed. OBS uses its existing `_service` configuration
+to select the latest matching tag and rebuild when the generated sources
+change. This runs independently of the GitHub binary package builds.
+
+To enable it, create a package-specific source-service token using an OBS
+account with write access to the package:
+
+```sh
+osc -A https://api.opensuse.org token --create --operation runservice home:PhoenixEmik kgamma2
+```
+
+Save the returned token string as the repository Actions secret
+`OBS_SERVICE_TOKEN` under **Settings → Secrets and variables → Actions**.
+See the [OBS token documentation](https://openbuildservice.org/help/manuals/obs-user-guide/cha-obs-authorization-token)
+for token management. Include the workflow in the commit being tagged; it
+does not run retroactively for existing tags. To refresh OBS sources manually,
+select **Update OBS sources → Run workflow** in the repository's Actions tab.
+A successful workflow confirms the trigger request; check the OBS package
+page for the source-service and build results.
+
 ## Upstream and license
 
 This fork follows [David Edmundson's KDE upstream](https://invent.kde.org/davidedmundson/kgamma2).

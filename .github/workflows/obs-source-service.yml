@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: 2026 PhoenixEmik <phoenix0919mik@gmail.com>
+# SPDX-License-Identifier: BSD-3-Clause
+
+name: Update OBS sources
+
+on:
+  push:
+    tags:
+      - v*
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: obs-home-PhoenixEmik-kgamma2
+  cancel-in-progress: false
+
+jobs:
+  run-source-service:
+    if: github.repository == 'PhoenixEmik/kgamma2' && (github.event_name != 'push' || !github.event.deleted)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Trigger OBS source service
+        shell: bash
+        env:
+          OBS_SERVICE_TOKEN: ${{ secrets.OBS_SERVICE_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$OBS_SERVICE_TOKEN" ]]; then
+            echo "::error::Set the OBS_SERVICE_TOKEN repository secret to a source-service token for home:PhoenixEmik/kgamma2."
+            exit 1
+          fi
+
+          curl --fail-with-body --silent --show-error \
+            --connect-timeout 15 --max-time 120 \
+            --retry 3 --retry-delay 5 --retry-max-time 120 \
+            --request POST \
+            --header "Authorization: Token $OBS_SERVICE_TOKEN" \
+            'https://api.opensuse.org/trigger/runservice?project=home%3APhoenixEmik&package=kgamma2'
