@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 3.21)
 
-set(KGAMMA2_VERSION "0.1.9" CACHE STRING "kgamma2 version")
+set(KGAMMA2_VERSION "0.2.0" CACHE STRING "kgamma2 version")
 project(kgamma_wayland VERSION ${KGAMMA2_VERSION} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)

@@ -1,3 +1,11 @@
+kgamma2 (0.2.0) unstable; urgency=medium
+
+  * Refine monitor controls with clearer spacing, RGB indicators, and headings.
+  * Compact the About layout and size its window to fit the content.
+  * Add proper padding around the About Close button.
+
+ -- PhoenixEmik <phoenix0919mik@gmail.com>  Tue, 13 Oct 2026 11:21:35 +0000
+
 kgamma2 (0.1.9) unstable; urgency=medium
 
   * Open only GitHub Issues when reporting a bug.
