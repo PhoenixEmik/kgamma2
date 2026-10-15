@@ -14,7 +14,8 @@ Kirigami.ApplicationWindow {
 
     width: 620
     height: minimumHeight + Kirigami.Units.largeSpacing * 2
-    visible: true
+    // Show after the initial layout and startup placement have been resolved.
+    visible: false
     title: i18n("Wayland Gamma")
     pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
 

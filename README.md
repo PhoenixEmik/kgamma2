@@ -77,6 +77,17 @@ Install the application, desktop file, and icon with:
 cmake --install build
 ```
 
+## Initial window placement
+
+On Plasma Wayland, KWin controls application window placement. To center
+kgamma2 on startup, import `/usr/share/kgamma2/kgamma2.kwinrule` in System
+Settings → Window Management → Window Rules. When running from source, import
+`data/kgamma2.kwinrule` instead. The rule only matches kgamma2's main window;
+it does not lock its position after opening or change other applications.
+
+On platforms that support application positioning, kgamma2 centers its initial
+window in the available area of the screen under the pointer.
+
 ## CLI
 
 Running `kgamma2` without arguments opens the GUI.

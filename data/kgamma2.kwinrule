@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 PhoenixEmik <phoenix0919mik@gmail.com>
+# SPDX-License-Identifier: BSD-3-Clause
+
+[kgamma2-center-main-window]
+Description=Center kgamma2 on startup
+wmclass=kgamma2
+wmclasscomplete=false
+wmclassmatch=1
+types=1
+placement=5
+placementrule=2

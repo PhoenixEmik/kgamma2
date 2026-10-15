@@ -93,6 +93,7 @@ target_link_libraries(kgamma2
 
 install(TARGETS kgamma2 ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES data/kgamma2.desktop DESTINATION ${KDE_INSTALL_APPDIR})
+install(FILES data/kgamma2.kwinrule DESTINATION ${KDE_INSTALL_DATADIR}/kgamma2)
 install(FILES data/icons/kgamma2.svg DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps)
 
 include(CTest)

@@ -46,6 +46,7 @@ previous color profile when an adjustment is reset.
 %doc README.md
 %{_bindir}/kgamma2
 %{_datadir}/applications/kgamma2.desktop
+%{_datadir}/kgamma2/
 %{_datadir}/icons/hicolor/scalable/apps/kgamma2.svg
 
 %changelog
