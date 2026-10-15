@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 Name:           kgamma2
-Version:        0.2.0
+Version:        0.2.1
 Release:        0
 Summary:        Gamma adjustment for KDE Plasma Wayland
 License:        LGPL-2.1-or-later AND BSD-3-Clause AND CC-BY-SA-4.0 AND CC0-1.0

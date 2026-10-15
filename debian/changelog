@@ -1,3 +1,10 @@
+kgamma2 (0.2.1) unstable; urgency=medium
+
+  * Center the initial window on platforms that support application positioning.
+  * Ship a kgamma2-only KWin rule for centered placement on Plasma Wayland.
+
+ -- PhoenixEmik <phoenix0919mik@gmail.com>  Thu, 15 Oct 2026 16:10:42 +0000
+
 kgamma2 (0.2.0) unstable; urgency=medium
 
   * Refine monitor controls with clearer spacing, RGB indicators, and headings.
