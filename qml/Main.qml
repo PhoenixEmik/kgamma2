@@ -285,11 +285,8 @@ Kirigami.ApplicationWindow {
                     Label {
                         Layout.fillWidth: true
                         visible: correctionSettings.lastSavedProfile.length > 0
-                        text: i18n("Correction active on this monitor")
+                        text: i18n("Correction active")
                         opacity: 0.7
-                        ToolTip.text: correctionSettings.lastSavedProfile
-                        ToolTip.visible: hoverHandler.hovered
-                        HoverHandler { id: hoverHandler }
                     }
                 }
             }

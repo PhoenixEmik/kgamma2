@@ -1,3 +1,10 @@
+kgamma2 (0.2.2) unstable; urgency=medium
+
+  * Shorten the active correction status to "Correction active".
+  * Remove the generated profile path tooltip from the status label.
+
+ -- PhoenixEmik <phoenix0919mik@gmail.com>  Fri, 16 Oct 2026 12:45:09 +0000
+
 kgamma2 (0.2.1) unstable; urgency=medium
 
   * Center the initial window on platforms that support application positioning.
