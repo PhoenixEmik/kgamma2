@@ -23,12 +23,20 @@ bool OutputManager::refresh(QString *error)
         if (!output->isConnected()) {
             continue;
         }
-        // UUID is KScreen's persistent output identifier. EDID plus connector
-        // distinguishes identical monitors when the backend does not supply one.
+        // KScreen's persistent output identifier. uuid() is preferred on
+        // libkscreen versions that provide it; otherwise EDID hash plus the
+        // output name distinguishes identical monitors. This identity is
+        // hashed into the per-output key that is persisted in state.json, in
+        // the ICC profile directory names, and in saved presets, so the
+        // derivation must stay stable for a given libkscreen version.
+#ifdef KGAMMA2_HAVE_OUTPUT_UUID
         QString identity = output->uuid();
         if (identity.isEmpty()) {
             identity = output->hashMd5() + QLatin1Char(':') + output->name();
         }
+#else
+        QString identity = output->hashMd5() + QLatin1Char(':') + output->name();
+#endif
         const auto key = QString::fromLatin1(QCryptographicHash::hash(identity.toUtf8(), QCryptographicHash::Sha256).toHex());
         ManagedOutput managedOutput;
         managedOutput.id = output->id();
