@@ -50,15 +50,14 @@ contains native packages for these KDE Plasma distributions:
 | openSUSE Tumbleweed | RPM | `sudo zypper install ./kgamma2-[0-9]*.x86_64.rpm` |
 | Fedora KDE 45 | RPM | `sudo dnf install ./kgamma2-[0-9]*.fc45.x86_64.rpm` |
 | Kubuntu / Ubuntu 26.04 | DEB | `sudo apt install ./kgamma2_[0-9]*_amd64.deb` |
+| Debian stable (13, trixie) | DEB | `sudo apt install ./kgamma2_[0-9]*_amd64.deb` |
 | Arch Linux, Manjaro, EndeavourOS | pacman | `sudo pacman -U ./kgamma2-[0-9]*-x86_64.pkg.tar.zst` |
 
 Download only the package for your distribution, then run its install command
 from the download directory. The package manager installs the required Qt,
 KDE Frameworks, KScreen, and LittleCMS libraries.
 
-KDE neon users can build from source with the commands below. Debian stable is
-not currently a binary target because its official Kirigami development
-package is based on KDE Frameworks 5, while kgamma2 requires Frameworks 6.
+KDE neon users can build from source with the commands below.
 
 ## Build from source
 
@@ -149,14 +148,14 @@ profile from it.
 ## Releases and packaging
 
 The [Linux package workflow](.github/workflows/linux-packages.yml) builds and
-tests packages in native openSUSE Tumbleweed, Fedora 45, Ubuntu 26.04, and Arch
-Linux environments. Pushing an explicit `vX.Y.Z` tag builds that version and
-publishes a GitHub Release with binary packages, source RPMs, debug RPMs, and
-SHA-256 checksums. Repushing a tag refreshes its release assets. Branch pushes,
-pull requests, and manual runs build the version in the packaging metadata
-and only produce temporary build artifacts. CI does not increment versions
-or create tags. Branch pushes that only change `README.md`, `docs/`, or both
-do not trigger a build.
+tests packages in native openSUSE Tumbleweed, Fedora 45, Ubuntu 26.04, Debian
+stable (13, trixie), and Arch Linux environments. Pushing an explicit `vX.Y.Z`
+tag builds that version and publishes a GitHub Release with binary packages,
+source RPMs, debug RPMs, and SHA-256 checksums. Repushing a tag refreshes its
+release assets. Branch pushes, pull requests, and manual runs build the version
+in the packaging metadata and only produce temporary build artifacts. CI does
+not increment versions or create tags. Branch pushes that only change
+`README.md`, `docs/`, or both do not trigger a build.
 
 Distribution packaging lives in `packaging/opensuse/`, `packaging/fedora/`,
 `packaging/arch/`, and `debian/`. The GUI and CLI are kept in one package on
