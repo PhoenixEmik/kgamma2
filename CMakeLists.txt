@@ -13,6 +13,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(ECM REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
+# Must be set before KDEInstallDirs so ECM's ECMQueryQt picks the Qt6 code
+# path. Without this, QT_MAJOR_VERSION is empty, KDEInstallDirs falls back to
+# KDEInstallDirs5.cmake, which pulls in Qt5Core and defines a Qt5 Qt::Core
+# target. Qt6's find_package then aborts with "Some (but not all) targets in
+# this export set were already defined: Core / CorePrivate".
+set(QT_DEFAULT_MAJOR_VERSION 6)
+set(QT_MAJOR_VERSION 6)
+
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
