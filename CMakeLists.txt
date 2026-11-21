@@ -13,6 +13,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(ECM REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
+# Must be set before KDEInstallDirs so ECM's ECMQueryQt picks the Qt6 code
+# path. Without this, QT_MAJOR_VERSION is empty, KDEInstallDirs falls back to
+# KDEInstallDirs5.cmake, which pulls in Qt5Core and defines a Qt5 Qt::Core
+# target. Qt6's find_package then aborts with "Some (but not all) targets in
+# this export set were already defined: Core / CorePrivate".
+set(QT_DEFAULT_MAJOR_VERSION 6)
+set(QT_MAJOR_VERSION 6)
+
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
@@ -27,6 +35,23 @@ find_package(KF6Screen REQUIRED)
 find_package(KF6Config REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LCMS2 REQUIRED IMPORTED_TARGET lcms2)
+
+# Older libkscreen releases do not expose KScreen::Output::uuid(). Detect it so
+# outputmanager.cpp can keep the historical identity derivation (uuid() when
+# available) on newer libkscreen while still compiling on older ones. Changing
+# the identity scheme would change the per-output key that is persisted in
+# state.json, the ICC profile directory names, and saved presets.
+include(CheckCXXSourceCompiles)
+get_target_property(_kscreen_include_dirs KF6::Screen INTERFACE_INCLUDE_DIRECTORIES)
+if(_kscreen_include_dirs)
+    set(CMAKE_REQUIRED_INCLUDES "${_kscreen_include_dirs}")
+    check_cxx_source_compiles(
+        "#include <kscreen/output.h>
+int main() { KScreen::Output *o = nullptr; (void)o->uuid(); return 0; }"
+        KGAMMA2_HAVE_OUTPUT_UUID)
+    unset(CMAKE_REQUIRED_INCLUDES)
+endif()
+unset(_kscreen_include_dirs)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -44,6 +69,9 @@ add_library(kgamma2_core STATIC
 )
 target_include_directories(kgamma2_core PUBLIC src/core)
 target_link_libraries(kgamma2_core PUBLIC Qt6::Core KF6::Screen KF6::ConfigCore PkgConfig::LCMS2)
+if(KGAMMA2_HAVE_OUTPUT_UUID)
+    target_compile_definitions(kgamma2_core PUBLIC KGAMMA2_HAVE_OUTPUT_UUID)
+endif()
 
 add_executable(kgamma2
     src/gui/main.cpp

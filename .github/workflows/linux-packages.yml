@@ -221,6 +221,61 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  debian-deb:
+    needs: version
+    runs-on: ubuntu-latest
+    container:
+      image: debian:13
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Install packaging tools and dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends \
+            build-essential ca-certificates cmake debhelper desktop-file-utils dpkg-dev \
+            extra-cmake-modules g++ git libkf6config-dev libkf6i18n-dev \
+            libkirigami-dev libkscreen-bin libkscreen-dev liblcms2-dev pkgconf \
+            qt6-base-dev qt6-declarative-dev
+
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Build and test DEB
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          sed -i -E "1s/\([^)]*\)/($VERSION)/" debian/changelog
+          test "$(dpkg-parsechangelog -SVersion)" = "$VERSION"
+          if ! dpkg-buildpackage --build=binary --no-sign 2>&1 \
+            | tee "$RUNNER_TEMP/debian-build.log"; then
+            message="$(tail -n 80 "$RUNNER_TEMP/debian-build.log")"
+            message="${message//'%'/'%25'}"
+            message="${message//$'\r'/'%0D'}"
+            message="${message//$'\n'/'%0A'}"
+            echo "::error title=Debian package build failed::$message"
+            exit 1
+          fi
+          mkdir -p dist
+          find .. -maxdepth 1 -type f -name '*.deb' -exec cp '{}' dist/ \;
+          cd dist
+          sha256sum ./*.deb > SHA256SUMS-debian-13
+
+      - name: Upload DEBs
+        uses: actions/upload-artifact@v4
+        with:
+          name: kgamma2-${{ needs.version.outputs.version }}-debian-13-amd64
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+
   arch-package:
     needs: version
     runs-on: ubuntu-latest
@@ -273,7 +328,7 @@ jobs:
 
   release:
     if: needs.version.outputs.release == 'true'
-    needs: [version, opensuse-rpm, fedora-rpm, ubuntu-deb, arch-package]
+    needs: [version, opensuse-rpm, fedora-rpm, ubuntu-deb, debian-deb, arch-package]
     runs-on: ubuntu-latest
     permissions:
       contents: write
